@@ -215,7 +215,8 @@
 
     <script>
         // ===== REPLACE WITH YOUR CLOUDFLARE WORKER URL =====
-const WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';        // ===================================================
+        const WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
+        // ===================================================
         
         let payments = [];
 
@@ -260,12 +261,14 @@ const WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers
         }
 
         async function saveToGoogleSheets(payment) {
+            console.log('Sending to Worker:', payment);
             const response = await fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payment)
             });
             const result = await response.json();
+            console.log('Response from Worker:', result);
             if (!result.success) throw new Error(result.error || 'Unknown error');
             return result;
         }
@@ -284,16 +287,18 @@ const WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers
                 document.getElementById('memberId').value = memberId;
             }
             
-            const payment =const payment = {
-    date: document.getElementById('date').value,
-    paymentType: document.getElementById('paymentType').value,
-    memberId: memberId,
-    memberName: displayName,
-    amount: parseFloat(document.getElementById('amount').value),
-    paymentMethod: document.getElementById('paymentMethod').value,
-    month: document.getElementById('month').value,
-    notes: document.getElementById('notes').value || ''
-};
+            const payment = {
+                date: document.getElementById('date').value,
+                paymentType: document.getElementById('paymentType').value,
+                memberId: memberId,
+                memberName: displayName,
+                amount: parseFloat(document.getElementById('amount').value),
+                paymentMethod: document.getElementById('paymentMethod').value,
+                month: document.getElementById('month').value,
+                notes: document.getElementById('notes').value || ''
+            };
+            
+            console.log('Payment object:', payment);
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
