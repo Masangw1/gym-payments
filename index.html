@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Payment Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 {
+            color: #ff6b6b;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #ccc;
+        }
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 10px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        .batch-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #e0e0e0;
+        }
+        .batch-toggle {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        .batch-form {
+            display: none;
+            margin-top: 20px;
+        }
+        .batch-form.active {
+            display: block;
+        }
+        .batch-entry {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .remove-btn {
+            background: #dc3545;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .add-btn {
+            background: #28a745;
+            margin-bottom: 15px;
+        }
+        .stats {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 Gym Payment Portal</h1>
+            <p>Record payments instantly</p>
+        </div>
+
+        <div class="form-card">
+            <div id="message" class="message"></div>
+            
+            <!-- Single Entry Form -->
+            <form id="paymentForm">
+                <div class="row">
+                    <div class="form-group">
+                        <label>Payment Type *</label>
+                        <select id="paymentType" required>
+                            <option value="Monthly Subscription">💰 Monthly Subscription</option>
+                            <option value="Drop-in">🏃 Drop-in</option>
+                            <option value="Class Fee">🧘 Class Fee</option>
+                            <option value="Late Fee">⚠️ Late Fee</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Member/Guest Name *</label>
+                        <input type="text" id="memberName" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Member ID (optional)</label>
+                        <input type="text" id="memberId" placeholder="M001 (auto if blank)">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Amount ($) *</label>
+                        <input type="number" id="amount" step="0.01" placeholder="50.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method *</label>
+                        <select id="paymentMethod" required>
+                            <option value="Cash">💵 Cash</option>
+                            <option value="Credit Card">💳 Credit Card</option>
+                            <option value="Bank Transfer">🏦 Bank Transfer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Month *</label>
+                        <input type="month" id="month" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Class Type (if class fee)</label>
+                        <input type="text" id="classType" placeholder="Aerobics / Yoga / Spin">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes (optional)</label>
+                    <input type="text" id="notes" placeholder="Any additional info">
+                </div>
+
+                <button type="submit" id="submitBtn">💾 Save Payment</button>
+            </form>
+
+            <!-- Batch Entry Toggle -->
+            <div class="batch-section">
+                <div class="batch-toggle" onclick="toggleBatch()">
+                    📦 Batch Entry (Enter Multiple Payments)
+                </div>
+                <div id="batchForm" class="batch-form">
+                    <div id="batchEntries"></div>
+                    <button type="button" class="add-btn" onclick="addBatchEntry()">+ Add Another Payment</button>
+                    <button type="button" onclick="submitBatch()">💾 Save All Payments</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                🏋️ All payments are securely recorded in your Google Sheet
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR GOOGLE SCRIPT URL
+        const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+        document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+
+        let batchCounter = 1;
+
+        // Single entry submission
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            let memberName = document.getElementById('memberName').value;
+            let classType = document.getElementById('classType').value;
+            let displayName = classType ? `${memberName} (${classType})` : memberName;
+
+            const data = {
+                date: document.getElementById('date').value,
+                paymentType: document.getElementById('paymentType').value,
+                memberId: document.getElementById('memberId').value,
+                memberName: displayName,
+                amount: document.getElementById('amount').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                month: document.getElementById('month').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                showMessage('✅ Payment saved successfully!', 'success');
+                document.getElementById('paymentForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+                
+            } catch(error) {
+                showMessage('❌ Error saving payment: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Save Payment';
+            }
+        });
+
+        // Batch entry functions
+        function toggleBatch() {
+            const batchForm = document.getElementById('batchForm');
+            batchForm.classList.toggle('active');
+            if (batchForm.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) {
+                addBatchEntry();
+            }
+        }
+
+        function addBatchEntry() {
+            const container = document.getElementById('batchEntries');
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'batch-entry';
+            entryDiv.id = `batch-${batchCounter}`;
+            entryDiv.innerHTML = `
+                <h4>Payment #${batchCounter}</h4>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" class="batch-date" value="${new Date().toISOString().slice(0,10)}">
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select class="batch-type">
+                            <option value="Monthly Subscription">Monthly Subscription</option>
+                            <option value="Drop-in">Drop-in</option>
+                            <option value="Class Fee">Class Fee</option>
+                            <option value="Late Fee">Late Fee</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="batch-name" placeholder="Member/Guest name">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" class="batch-amount" step="0.01" placeholder="50.00">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Method</label>
+                        <select class="batch-method">
+                            <option value="Cash">Cash</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Month</label>
+                        <input type="month" class="batch-month" value="${new Date().toISOString().slice(0,7)}">
+                    </div>
+                </div>
+                <button class="remove-btn" onclick="removeBatchEntry(${batchCounter})">Remove</button>
+            `;
+            container.appendChild(entryDiv);
+            batchCounter++;
+        }
+
+        function removeBatchEntry(id) {
+            const element = document.getElementById(`batch-${id}`);
+            if (element) element.remove();
+        }
+
+        async function submitBatch() {
+            const entries = [];
+            const batchEntries = document.querySelectorAll('.batch-entry');
+            
+            for (let entry of batchEntries) {
+                const name = entry.querySelector('.batch-name').value;
+                const amount = entry.querySelector('.batch-amount').value;
+                
+                if (name && amount) {
+                    entries.push({
+                        date: entry.querySelector('.batch-date').value,
+                        paymentType: entry.querySelector('.batch-type').value,
+                        memberId: '',
+                        memberName: name,
+                        amount: amount,
+                        paymentMethod: entry.querySelector('.batch-method').value,
+                        month: entry.querySelector('.batch-month').value,
+                        notes: 'Batch entry'
+                    });
+                }
+            }
+            
+            if (entries.length === 0) {
+                showMessage('No valid entries to save', 'error');
+                return;
+            }
+            
+            let saved = 0;
+            for (let data of entries) {
+                try {
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    });
+                    saved++;
+                } catch(e) {
+                    console.error('Error saving:', e);
+                }
+            }
+            
+            showMessage(`✅ Saved ${saved} of ${entries.length} payments!`, 'success');
+            document.getElementById('batchEntries').innerHTML = '';
+            batchCounter = 1;
+            document.getElementById('batchForm').classList.remove('active');
+        }
+
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = `message ${type}`;
+            setTimeout(() => {
+                messageDiv.className = 'message';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
