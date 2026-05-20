@@ -284,16 +284,16 @@ const WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers
                 document.getElementById('memberId').value = memberId;
             }
             
-            const payment = {
-                date: document.getElementById('date').value,
-                paymentType: document.getElementById('paymentType').value,
-                memberId: memberId,
-                memberName: displayName,
-                amount: parseFloat(document.getElementById('amount').value),
-                paymentMethod: document.getElementById('paymentMethod').value,
-                month: document.getElementById('month').value,
-                notes: document.getElementById('notes').value || ''
-            };
+            const payment =const payment = {
+    date: document.getElementById('date').value,
+    paymentType: document.getElementById('paymentType').value,
+    memberId: memberId,
+    memberName: displayName,
+    amount: parseFloat(document.getElementById('amount').value),
+    paymentMethod: document.getElementById('paymentMethod').value,
+    month: document.getElementById('month').value,
+    notes: document.getElementById('notes').value || ''
+};
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
