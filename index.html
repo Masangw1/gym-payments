@@ -89,6 +89,7 @@
             padding: 8px 12px;
             font-size: 14px;
             margin-top: 10px;
+            width: auto;
         }
         .add-btn { background: #28a745; margin-bottom: 15px; }
         .stats {
@@ -214,15 +215,16 @@
     </div>
 
     <script>
-        // ===== REPLACE WITH YOUR CLOUDFLARE WORKER URL =====
-        const WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
-        // ===================================================
+        // CLOUDFLARE WORKER URL
+        var WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
         
-        let payments = [];
+        var payments = [];
 
         function loadData() {
-            const saved = localStorage.getItem('gymPayments');
-            if (saved) payments = JSON.parse(saved);
+            var saved = localStorage.getItem('gymPayments');
+            if (saved) {
+                payments = JSON.parse(saved);
+            }
             renderTable();
             updateStats();
         }
@@ -237,23 +239,31 @@
         }
 
         function renderTable() {
-            const tbody = document.getElementById('tableBody');
+            var tbody = document.getElementById('tableBody');
             if (payments.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No payments</td></tr>';
                 return;
             }
             tbody.innerHTML = '';
-            for (let i = payments.length - 1; i >= 0; i--) {
-                const p = payments[i];
-                tbody.innerHTML += `<tr><td>${p.date}</td><td>${p.paymentType}</td><td>${p.memberName}</td><td>${p.amount}</td><td>${p.paymentMethod}</td><td>${p.month}</td></tr>`;
+            for (var i = payments.length - 1; i >= 0; i--) {
+                var p = payments[i];
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + p.date + '</td>' +
+                    '<td>' + p.paymentType + '</td>' +
+                    '<td>' + p.memberName + '</td>' +
+                    '<td>' + p.amount + '</td>' +
+                    '<td>' + p.paymentMethod + '</td>' +
+                    '<td>' + p.month + '</td>' +
+                    '</tr>';
             }
         }
 
         function generateMemberId() {
-            let maxNum = 0;
-            for (let p of payments) {
+            var maxNum = 0;
+            for (var i = 0; i < payments.length; i++) {
+                var p = payments[i];
                 if (p.memberId && p.memberId.match(/M(\d+)/)) {
-                    let num = parseInt(p.memberId.match(/M(\d+)/)[1]);
+                    var num = parseInt(p.memberId.match(/M(\d+)/)[1]);
                     if (num > maxNum) maxNum = num;
                 }
             }
@@ -261,33 +271,32 @@
         }
 
         async function saveToGoogleSheets(payment) {
-            console.log('Sending to Worker:', payment);
-            const response = await fetch(WORKER_URL, {
+            var response = await fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payment)
             });
-            const result = await response.json();
-            console.log('Response from Worker:', result);
-            if (!result.success) throw new Error(result.error || 'Unknown error');
+            var result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Unknown error');
+            }
             return result;
         }
 
         document.getElementById('paymentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            let memberName = document.getElementById('memberName').value;
-            let classType = document.getElementById('classType').value;
-            let displayName = classType ? `${memberName} (${classType})` : memberName;
-            let memberId = document.getElementById('memberId').value;
+            var memberName = document.getElementById('memberName').value;
+            var classType = document.getElementById('classType').value;
+            var displayName = classType ? memberName + ' (' + classType + ')' : memberName;
+            var memberId = document.getElementById('memberId').value;
             
-            // Auto-generate Member ID for subscriptions if blank
             if (!memberId && document.getElementById('paymentType').value === 'Monthly Subscription') {
                 memberId = generateMemberId();
                 document.getElementById('memberId').value = memberId;
             }
             
-            const payment = {
+            var payment = {
                 date: document.getElementById('date').value,
                 paymentType: document.getElementById('paymentType').value,
                 memberId: memberId,
@@ -298,18 +307,16 @@
                 notes: document.getElementById('notes').value || ''
             };
             
-            console.log('Payment object:', payment);
-            
-            const btn = document.getElementById('submitBtn');
+            var btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.textContent = 'Saving...';
             
             try {
-                const result = await saveToGoogleSheets(payment);
+                var result = await saveToGoogleSheets(payment);
                 payments.push(payment);
                 saveData();
                 renderTable();
-                showMessage(`✅ ${displayName} paid ${payment.amount} - Row ${result.row}`, 'success');
+                showMessage('✅ ' + displayName + ' paid ' + payment.amount + ' - Row ' + result.row, 'success');
                 
                 document.getElementById('paymentForm').reset();
                 document.getElementById('date').valueAsDate = new Date();
@@ -319,73 +326,83 @@
                 document.getElementById('notes').value = '';
                 
             } catch(error) {
-                showMessage(`❌ Error: ${error.message}`, 'error');
+                showMessage('❌ Error: ' + error.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '💾 Save Payment';
             }
         });
 
-        let batchCounter = 1;
+        var batchCounter = 1;
         
         function toggleBatch() {
-            const batchForm = document.getElementById('batchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) {
-                addBatchEntry();
+            var batchForm = document.getElementById('batchForm');
+            if (batchForm.classList.contains('active')) {
+                batchForm.classList.remove('active');
+            } else {
+                batchForm.classList.add('active');
+                if (document.getElementById('batchEntries').children.length === 0) {
+                    addBatchEntry();
+                }
             }
         }
 
         function addBatchEntry() {
-            const container = document.getElementById('batchEntries');
-            const id = batchCounter;
-            const entryDiv = document.createElement('div');
+            var container = document.getElementById('batchEntries');
+            var id = batchCounter;
+            var today = new Date().toISOString().slice(0,10);
+            var currentMonth = new Date().toISOString().slice(0,7);
+            var entryDiv = document.createElement('div');
             entryDiv.className = 'batch-entry';
-            entryDiv.id = `batch-${id}`;
-            entryDiv.innerHTML = `
-                <h4>Payment #${id}</h4>
-                <div class="row">
-                    <div class="form-group"><label>Date</label><input type="date" class="batch-date" value="${new Date().toISOString().slice(0,10)}"></div>
-                    <div class="form-group"><label>Type</label>
-                        <select class="batch-type">
-                            <option value="Monthly Subscription">Monthly Subscription</option>
-                            <option value="Drop-in">Drop-in</option>
-                            <option value="Class Fee">Class Fee</option>
-                            <option value="Late Fee">Late Fee</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>
-                    <div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>
-                </div>
-                <div class="row">
-                    <div class="form-group"><label>Method</label>
-                        <select class="batch-method">
-                            <option value="Cash">Cash</option>
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Month</label><input type="month" class="batch-month" value="${new Date().toISOString().slice(0,7)}"></div>
-                </div>
-                <button class="remove-btn" onclick="document.getElementById('batch-${id}').remove()">Remove</button>
-            `;
+            entryDiv.id = 'batch-' + id;
+            entryDiv.innerHTML = '<h4>Payment #' + id + '</h4>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div>' +
+                    '<div class="form-group"><label>Type</label>' +
+                        '<select class="batch-type">' +
+                            '<option value="Monthly Subscription">Monthly Subscription</option>' +
+                            '<option value="Drop-in">Drop-in</option>' +
+                            '<option value="Class Fee">Class Fee</option>' +
+                            '<option value="Late Fee">Late Fee</option>' +
+                        '</select>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>' +
+                    '<div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Method</label>' +
+                        '<select class="batch-method">' +
+                            '<option value="Cash">Cash</option>' +
+                            '<option value="Credit Card">Credit Card</option>' +
+                            '<option value="Bank Transfer">Bank Transfer</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + currentMonth + '"></div>' +
+                '</div>' +
+                '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
             container.appendChild(entryDiv);
             batchCounter++;
         }
 
+        function removeBatchEntry(id) {
+            var element = document.getElementById('batch-' + id);
+            if (element) element.remove();
+        }
+
         async function submitBatch() {
-            const batchEntries = document.querySelectorAll('.batch-entry');
-            let saved = 0;
-            let failed = 0;
+            var batchEntries = document.querySelectorAll('.batch-entry');
+            var saved = 0;
+            var failed = 0;
             
-            for (let entry of batchEntries) {
-                const name = entry.querySelector('.batch-name').value;
-                const amount = entry.querySelector('.batch-amount').value;
+            for (var i = 0; i < batchEntries.length; i++) {
+                var entry = batchEntries[i];
+                var name = entry.querySelector('.batch-name').value;
+                var amount = entry.querySelector('.batch-amount').value;
                 
                 if (name && amount) {
-                    const payment = {
+                    var payment = {
                         date: entry.querySelector('.batch-date').value,
                         paymentType: entry.querySelector('.batch-type').value,
                         memberId: '',
@@ -409,7 +426,7 @@
             if (saved > 0) {
                 saveData();
                 renderTable();
-                showMessage(`✅ Saved ${saved} payment(s)! ${failed > 0 ? `(${failed} failed)` : ''}`, 'success');
+                showMessage('✅ Saved ' + saved + ' payment(s)! ' + (failed > 0 ? '(' + failed + ' failed)' : ''), 'success');
             } else {
                 showMessage('No valid entries to save', 'error');
             }
@@ -420,10 +437,12 @@
         }
 
         function showMessage(msg, type) {
-            const messageDiv = document.getElementById('message');
+            var messageDiv = document.getElementById('message');
             messageDiv.textContent = msg;
-            messageDiv.className = `message ${type}`;
-            setTimeout(() => messageDiv.className = 'message', 5000);
+            messageDiv.className = 'message ' + type;
+            setTimeout(function() {
+                messageDiv.className = 'message';
+            }, 5000);
         }
 
         document.getElementById('date').valueAsDate = new Date();
