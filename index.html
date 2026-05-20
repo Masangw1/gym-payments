@@ -215,10 +215,11 @@
     </div>
 
     <script>
-        // CLOUDFLARE WORKER URL
+        // CLOUDFLARE WORKER URL - UPDATE THIS
         var WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
         
         var payments = [];
+        var batchCounter = 1;
 
         function loadData() {
             var saved = localStorage.getItem('gymPayments');
@@ -244,18 +245,19 @@
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No payments</td></tr>';
                 return;
             }
-            tbody.innerHTML = '';
+            var html = '';
             for (var i = payments.length - 1; i >= 0; i--) {
                 var p = payments[i];
-                tbody.innerHTML += '<tr>' +
-                    '<td>' + p.date + '</td>' +
-                    '<td>' + p.paymentType + '</td>' +
-                    '<td>' + p.memberName + '</td>' +
-                    '<td>' + p.amount + '</td>' +
-                    '<td>' + p.paymentMethod + '</td>' +
-                    '<td>' + p.month + '</td>' +
-                    '</tr>';
+                html += '<tr>';
+                html += '<td>' + p.date + '</td>';
+                html += '<td>' + p.paymentType + '</td>';
+                html += '<td>' + p.memberName + '</td>';
+                html += '<td>' + p.amount + '</td>';
+                html += '<td>' + p.paymentMethod + '</td>';
+                html += '<td>' + p.month + '</td>';
+                html += '</tr>';
             }
+            tbody.innerHTML = html;
         }
 
         function generateMemberId() {
@@ -267,28 +269,35 @@
                     if (num > maxNum) maxNum = num;
                 }
             }
-            return 'M' + String(maxNum + 1).padStart(3, '0');
+            var newNum = maxNum + 1;
+            var padded = 'M' + (newNum < 10 ? '00' + newNum : (newNum < 100 ? '0' + newNum : newNum));
+            return padded;
         }
 
-        async function saveToGoogleSheets(payment) {
-            var response = await fetch(WORKER_URL, {
+        function saveToGoogleSheets(payment) {
+            return fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payment)
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (!result.success) {
+                    throw new Error(result.error || 'Unknown error');
+                }
+                return result;
             });
-            var result = await response.json();
-            if (!result.success) {
-                throw new Error(result.error || 'Unknown error');
-            }
-            return result;
         }
 
-        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             var memberName = document.getElementById('memberName').value;
             var classType = document.getElementById('classType').value;
-            var displayName = classType ? memberName + ' (' + classType + ')' : memberName;
+            var displayName = memberName;
+            if (classType) {
+                displayName = memberName + ' (' + classType + ')';
+            }
             var memberId = document.getElementById('memberId').value;
             
             if (!memberId && document.getElementById('paymentType').value === 'Monthly Subscription') {
@@ -311,30 +320,29 @@
             btn.disabled = true;
             btn.textContent = 'Saving...';
             
-            try {
-                var result = await saveToGoogleSheets(payment);
-                payments.push(payment);
-                saveData();
-                renderTable();
-                showMessage('✅ ' + displayName + ' paid ' + payment.amount + ' - Row ' + result.row, 'success');
-                
-                document.getElementById('paymentForm').reset();
-                document.getElementById('date').valueAsDate = new Date();
-                document.getElementById('month').value = new Date().toISOString().slice(0, 7);
-                document.getElementById('memberId').value = '';
-                document.getElementById('classType').value = '';
-                document.getElementById('notes').value = '';
-                
-            } catch(error) {
-                showMessage('❌ Error: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '💾 Save Payment';
-            }
+            saveToGoogleSheets(payment)
+                .then(function(result) {
+                    payments.push(payment);
+                    saveData();
+                    renderTable();
+                    showMessage('✅ ' + displayName + ' paid ' + payment.amount + ' - Row ' + result.row, 'success');
+                    
+                    document.getElementById('paymentForm').reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+                    document.getElementById('memberId').value = '';
+                    document.getElementById('classType').value = '';
+                    document.getElementById('notes').value = '';
+                })
+                .catch(function(error) {
+                    showMessage('❌ Error: ' + error.message, 'error');
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.textContent = '💾 Save Payment';
+                });
         });
 
-        var batchCounter = 1;
-        
         function toggleBatch() {
             var batchForm = document.getElementById('batchForm');
             if (batchForm.classList.contains('active')) {
@@ -383,18 +391,21 @@
                 '</div>' +
                 '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
             container.appendChild(entryDiv);
-            batchCounter++;
+            batchCounter = batchCounter + 1;
         }
 
         function removeBatchEntry(id) {
             var element = document.getElementById('batch-' + id);
-            if (element) element.remove();
+            if (element) {
+                element.remove();
+            }
         }
 
-        async function submitBatch() {
+        function submitBatch() {
             var batchEntries = document.querySelectorAll('.batch-entry');
             var saved = 0;
             var failed = 0;
+            var promises = [];
             
             for (var i = 0; i < batchEntries.length; i++) {
                 var entry = batchEntries[i];
@@ -413,27 +424,35 @@
                         notes: 'Batch entry'
                     };
                     
-                    try {
-                        await saveToGoogleSheets(payment);
-                        payments.push(payment);
-                        saved++;
-                    } catch(error) {
-                        failed++;
-                    }
+                    var promise = saveToGoogleSheets(payment)
+                        .then(function() {
+                            saved = saved + 1;
+                            payments.push(payment);
+                        })
+                        .catch(function() {
+                            failed = failed + 1;
+                        });
+                    promises.push(promise);
                 }
             }
             
-            if (saved > 0) {
-                saveData();
-                renderTable();
-                showMessage('✅ Saved ' + saved + ' payment(s)! ' + (failed > 0 ? '(' + failed + ' failed)' : ''), 'success');
-            } else {
-                showMessage('No valid entries to save', 'error');
-            }
-            
-            document.getElementById('batchEntries').innerHTML = '';
-            batchCounter = 1;
-            document.getElementById('batchForm').classList.remove('active');
+            Promise.all(promises).then(function() {
+                if (saved > 0) {
+                    saveData();
+                    renderTable();
+                    var msg = '✅ Saved ' + saved + ' payment(s)!';
+                    if (failed > 0) {
+                        msg = msg + ' (' + failed + ' failed)';
+                    }
+                    showMessage(msg, 'success');
+                } else {
+                    showMessage('No valid entries to save', 'error');
+                }
+                
+                document.getElementById('batchEntries').innerHTML = '';
+                batchCounter = 1;
+                document.getElementById('batchForm').classList.remove('active');
+            });
         }
 
         function showMessage(msg, type) {
@@ -445,8 +464,11 @@
             }, 5000);
         }
 
+        // Set today's date as default
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+        
+        // Initialize
         loadData();
     </script>
 </body>
