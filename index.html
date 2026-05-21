@@ -153,8 +153,8 @@
                         <input type="text" id="memberName" placeholder="John Doe" required>
                     </div>
                     <div class="form-group">
-                        <label>Member ID</label>
-                        <input type="text" id="memberId" placeholder="Auto-generated if blank">
+                        <label>Member ID (Optional)</label>
+                        <input type="text" id="memberId" placeholder="Leave blank - auto-assigned">
                     </div>
                 </div>
 
@@ -167,7 +167,7 @@
                         <label>Payment Method *</label>
                         <select id="paymentMethod" required>
                             <option value="Cash">💵 Cash</option>
-                            <option value="Airtel money">💳 Airtel money</option>
+                            <option value="Airtel Money">📱 Airtel Money</option>
                             <option value="Bank Transfer">🏦 Bank Transfer</option>
                         </select>
                     </div>
@@ -209,7 +209,7 @@
         <div class="data-table">
             <table id="paymentTable">
                 <thead><tr><th>Date</th><th>Type</th><th>Name</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead>
-                <tbody id="tableBody"><tr><td colspan="6" style="text-align:center;">No payments</td></tr></tbody>
+                <tbody id="tableBody"><td><td colspan="6" style="text-align:center;">No payments</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -260,19 +260,8 @@
             tbody.innerHTML = html;
         }
 
-        function generateMemberId() {
-            var maxNum = 0;
-            for (var i = 0; i < payments.length; i++) {
-                var p = payments[i];
-                if (p.memberId && p.memberId.match(/M(\d+)/)) {
-                    var num = parseInt(p.memberId.match(/M(\d+)/)[1]);
-                    if (num > maxNum) maxNum = num;
-                }
-            }
-            var newNum = maxNum + 1;
-            var padded = 'M' + (newNum < 10 ? '00' + newNum : (newNum < 100 ? '0' + newNum : newNum));
-            return padded;
-        }
+        // NO LOCAL MEMBER ID GENERATION - Let Google Sheets handle it
+        // The API will create or find the correct Member ID
 
         function saveToGoogleSheets(payment) {
             return fetch(WORKER_URL, {
@@ -280,7 +269,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payment)
             })
-            .then(function(response) { return response.json(); })
+            .then(function(response) { 
+                return response.json(); 
+            })
             .then(function(result) {
                 if (!result.success) {
                     throw new Error(result.error || 'Unknown error');
@@ -298,17 +289,13 @@
             if (classType) {
                 displayName = memberName + ' (' + classType + ')';
             }
+            // DO NOT generate Member ID locally - leave blank for API to handle
             var memberId = document.getElementById('memberId').value;
-            
-            if (!memberId && document.getElementById('paymentType').value === 'Monthly Subscription') {
-                memberId = generateMemberId();
-                document.getElementById('memberId').value = memberId;
-            }
             
             var payment = {
                 date: document.getElementById('date').value,
                 paymentType: document.getElementById('paymentType').value,
-                memberId: memberId,
+                memberId: memberId || '',  // Send empty string if blank
                 memberName: displayName,
                 amount: parseFloat(document.getElementById('amount').value),
                 paymentMethod: document.getElementById('paymentMethod').value,
@@ -322,10 +309,12 @@
             
             saveToGoogleSheets(payment)
                 .then(function(result) {
+                    // Store in local display (not as master record)
                     payments.push(payment);
                     saveData();
                     renderTable();
-                    showMessage('✅ ' + displayName + ' paid ' + payment.amount + ' - Row ' + result.row, 'success');
+                    var memberMsg = result.memberId ? ' (Member: ' + result.memberId + ')' : '';
+                    showMessage('✅ ' + displayName + ' paid ' + payment.amount + memberMsg, 'success');
                     
                     document.getElementById('paymentForm').reset();
                     document.getElementById('date').valueAsDate = new Date();
@@ -383,7 +372,7 @@
                     '<div class="form-group"><label>Method</label>' +
                         '<select class="batch-method">' +
                             '<option value="Cash">Cash</option>' +
-                            '<option value="Credit Card">Credit Card</option>' +
+                            '<option value="Airtel Money">Airtel Money</option>' +
                             '<option value="Bank Transfer">Bank Transfer</option>' +
                         '</select>' +
                     '</div>' +
@@ -416,7 +405,7 @@
                     var payment = {
                         date: entry.querySelector('.batch-date').value,
                         paymentType: entry.querySelector('.batch-type').value,
-                        memberId: '',
+                        memberId: '',  // Let API handle member ID
                         memberName: name,
                         amount: parseFloat(amount),
                         paymentMethod: entry.querySelector('.batch-method').value,
