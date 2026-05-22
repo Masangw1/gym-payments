@@ -400,15 +400,15 @@
                 
                 if (name && amount) {
                     var payment = {
-                        date: entry.querySelector('.batch-date').value,
-                        paymentType: entry.querySelector('.batch-type').value,
-                        memberId: '',
-                        memberName: name.trim(),
-                        amount: parseFloat(amount),
-                        paymentMethod: entry.querySelector('.batch-method').value,
-                        month: entry.querySelector('.batch-month').value,
-                        notes: 'Batch entry'
-                    };
+                    date: entry.querySelector('.batch-date').value,
+                    paymentType: entry.querySelector('.batch-type').value,
+                    memberId: '',
+                    memberName: name.trim(),  // ← Make sure this is the actual name from the input
+                    amount: parseFloat(amount),
+                    paymentMethod: entry.querySelector('.batch-method').value,
+                    month: entry.querySelector('.batch-month').value,
+                    notes: 'Batch entry'
+                  };
                     paymentsToSave.push(payment);
                 }
             }
