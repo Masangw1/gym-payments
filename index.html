@@ -14,6 +14,7 @@
         }
         .container { max-width: 600px; margin: 0 auto; }
         
+        /* Header - Mobile Optimized */
         .header {
             text-align: center;
             background: rgba(255,255,255,0.1);
@@ -68,28 +69,13 @@
             color: #ff6b6b;
         }
         
-        .admin-panel-btn {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 999;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
+        /* Hidden Admin Panel */
         .hidden-admin {
             display: none;
             position: fixed;
-            bottom: 70px;
-            right: 15px;
-            left: 15px;
+            bottom: 10px;
+            right: 10px;
+            left: 10px;
             background: #1a1a2e;
             border: 1px solid #ff6b6b;
             border-radius: 12px;
@@ -134,6 +120,7 @@
             font-size: 16px;
         }
         
+        /* Tabs */
         .tabs {
             display: flex;
             gap: 8px;
@@ -154,6 +141,7 @@
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
         }
         
+        /* Forms */
         .form-card {
             background: white;
             border-radius: 16px;
@@ -247,6 +235,7 @@
             color: #666;
         }
         
+        /* Table */
         .data-table {
             margin-top: 20px;
             background: white;
@@ -275,6 +264,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Header with Gym Logo (Picture Support) -->
         <div class="header">
             <img id="gymBanner" class="gym-banner" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop" alt="Gym Interior">
             <div id="gymLogo" class="gym-logo">
@@ -286,9 +276,7 @@
             </div>
         </div>
 
-        <!-- Admin Button (Always visible on mobile) -->
-        <button class="admin-panel-btn" onclick="toggleHiddenAdmin()">⚙️ Admin</button>
-
+        <!-- Hidden Admin Panel (Ctrl+Shift+A) -->
         <div id="hiddenAdmin" class="hidden-admin">
             <span class="admin-close" onclick="toggleHiddenAdmin()">✕</span>
             <h4>🔧 Admin Settings</h4>
@@ -312,11 +300,13 @@
             <button class="admin-btn" style="margin-top:8px; background:#333;" onclick="toggleHiddenAdmin()">Close</button>
         </div>
 
+        <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('payment')">💰 Payments</button>
             <button class="tab" onclick="switchTab('expense')">📝 Expenses</button>
         </div>
 
+        <!-- PAYMENT FORM -->
         <div id="paymentForm" class="form-card active">
             <div id="message" class="message"></div>
             <form id="paymentEntryForm">
@@ -388,6 +378,7 @@
             </div>
         </div>
 
+        <!-- EXPENSE FORM -->
         <div id="expenseForm" class="form-card">
             <div id="expenseMessage" class="message"></div>
             <form id="expenseEntryForm">
@@ -436,26 +427,23 @@
             </div>
         </div>
 
+        <!-- Payment History Table -->
         <div class="data-table">
             <table id="paymentTable">
                 <thead><tr><th>Date</th><th>Type</th><th>Name</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead>
                 <tbody id="tableBody"><tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr></tbody>
-            </table>
+            <table>
         </div>
     </div>
 
     <script>
         var WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
         
-        // ============================================================
-        // EDIT THESE VALUES DIRECTLY IN THE SCRIPT (PERMANENT)
-        // ============================================================
         var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
         var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
-        // ============================================================
         
         var BANNER_IMAGES = [
-            'https://drive.google.com/uc?export=view&id=1esjvC0kxsmFStQ7fFsENOtI8C6Edz7uP',
+            'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop',
             'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&h=180&fit=crop',
             'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=600&h=180&fit=crop',
             'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&h=180&fit=crop',
@@ -466,54 +454,7 @@
         var batchCounter = 1;
         var expenseBatchCounter = 1;
 
-        // ========== GYM INFO MANAGEMENT ==========
-        function loadGymInfo() {
-            // Try localStorage first, then fallback to hardcoded values
-            var savedDescription = localStorage.getItem('gymDescription');
-            var savedTagline = localStorage.getItem('gymTagline');
-            
-            var descElement = document.getElementById('gymDescription');
-            var taglineElement = document.getElementById('gymTagline');
-            
-            if (savedDescription && savedDescription !== '') {
-                descElement.innerText = savedDescription;
-            } else {
-                descElement.innerText = GYM_DESCRIPTION;
-            }
-            
-            if (savedTagline && savedTagline !== '') {
-                taglineElement.innerText = savedTagline;
-            } else {
-                taglineElement.innerText = GYM_TAGLINE;
-            }
-        }
-        
-        function saveGymInfo() {
-            var newDescription = document.getElementById('adminDescription').value;
-            var newTagline = document.getElementById('adminTagline').value;
-            
-            if (newDescription && newDescription !== '') {
-                localStorage.setItem('gymDescription', newDescription);
-                document.getElementById('gymDescription').innerText = newDescription;
-            }
-            if (newTagline && newTagline !== '') {
-                localStorage.setItem('gymTagline', newTagline);
-                document.getElementById('gymTagline').innerText = newTagline;
-            }
-            
-            showMessage('message', '✅ Gym information saved!', 'success');
-            toggleHiddenAdmin();
-        }
-        
-        function resetGymInfoToHardcoded() {
-            localStorage.removeItem('gymDescription');
-            localStorage.removeItem('gymTagline');
-            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
-            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
-            showMessage('message', '✅ Reset to hardcoded values!', 'success');
-        }
-
-        // ========== LOGO MANAGEMENT ==========
+        // ========== LOGO MANAGEMENT (Picture Support) ==========
         function setLogoImage(imageDataUrl) {
             var logoDiv = document.getElementById('gymLogo');
             logoDiv.innerHTML = '<img src="' + imageDataUrl + '" alt="Gym Logo">';
@@ -528,31 +469,35 @@
         }
         
         function loadSavedLogo() {
-    // === EDIT THIS LINE ===
-    var GOOGLE_DRIVE_LOGO_URL = 'https://drive.google.com/uc?export=view&id=1esjvC0kxsmFStQ7fFsENOtI8C6Edz7uP';
-    // ======================
-    
-    var savedLogo = localStorage.getItem('gymLogoData');
-    var logoDiv = document.getElementById('gymLogo');
-    
-    // Always use Google Drive URL as primary
-    logoDiv.innerHTML = '<img src="' + GOOGLE_DRIVE_LOGO_URL + '" alt="Gym Logo">';
-    
-    // Also save it to localStorage for faster loading next time
-    if (savedLogo !== GOOGLE_DRIVE_LOGO_URL) {
-        localStorage.setItem('gymLogoData', GOOGLE_DRIVE_LOGO_URL);
-    }
-}
+            var savedLogo = localStorage.getItem('gymLogoData');
+            if (savedLogo) {
+                var logoDiv = document.getElementById('gymLogo');
+                logoDiv.innerHTML = '<img src="' + savedLogo + '" alt="Gym Logo">';
+            }
+        }
+
         // ========== ADMIN PANEL ==========
         function toggleHiddenAdmin() {
             var panel = document.getElementById('hiddenAdmin');
             panel.classList.toggle('active');
             if (panel.classList.contains('active')) {
-                var currentDesc = document.getElementById('gymDescription').innerText;
-                var currentTagline = document.getElementById('gymTagline').innerText;
-                document.getElementById('adminDescription').value = currentDesc;
-                document.getElementById('adminTagline').value = currentTagline;
+                document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
+                document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
             }
+        }
+        
+        function saveGymInfo() {
+            var newDescription = document.getElementById('adminDescription').value;
+            var newTagline = document.getElementById('adminTagline').value;
+            if (newDescription) { document.getElementById('gymDescription').innerText = newDescription; }
+            if (newTagline) { document.getElementById('gymTagline').innerText = newTagline; }
+            showMessage('message', '✅ Gym information saved!', 'success');
+            toggleHiddenAdmin();
+        }
+        
+        function initGymInfo() {
+            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
+            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
         }
         
         function changeBannerImage() {
@@ -564,9 +509,7 @@
         
         function loadSavedBanner() {
             var savedImage = localStorage.getItem('gymBannerImage');
-            if (savedImage && savedImage !== '') {
-                document.getElementById('gymBanner').src = savedImage;
-            }
+            if (savedImage) { document.getElementById('gymBanner').src = savedImage; }
         }
         
         // Logo upload handler
@@ -582,10 +525,15 @@
             }
         });
         
+        // Keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); toggleHiddenAdmin(); }
+        });
+        
         // ========== TAB SWITCHING ==========
         function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-            document.querySelectorAll('.form-card').forEach(function(f) { f.classList.remove('active'); });
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-card').forEach(f => f.classList.remove('active'));
             if (tab === 'payment') {
                 document.querySelector('.tab:first-child').classList.add('active');
                 document.getElementById('paymentForm').classList.add('active');
@@ -612,14 +560,7 @@
             var html = '';
             for (var i = payments.length - 1; i >= 0; i--) {
                 var p = payments[i];
-                html += '<tr>';
-                html += '<td>' + p.date + '</td>';
-                html += '<td>' + p.paymentType + '</td>';
-                html += '<td>' + p.memberName + '</td>';
-                html += '<td>' + p.amount + '</td>';
-                html += '<td>' + p.paymentMethod + '</td>';
-                html += '<td>' + p.month + '</td>';
-                html += '</tr>';
+                html += '<tr><td>' + p.date + '</td><td>' + p.paymentType + '</td><td>' + p.memberName + '</td><td>' + p.amount + '</td><td>' + p.paymentMethod + '</td><td>' + p.month + '</td></tr>';
             }
             tbody.innerHTML = html;
         }
@@ -629,7 +570,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            }).then(function(r) { return r.json(); }).then(function(r) { if (!r.success) throw new Error(r.error); return r; });
+            }).then(r => r.json()).then(r => { if (!r.success) throw new Error(r.error); return r; });
         }
         
         document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
@@ -803,15 +744,16 @@
             setTimeout(function() { d.className = 'message'; }, 4000);
         }
         
+        // Set default dates
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('month').value = new Date().toISOString().slice(0,7);
         document.getElementById('expenseDate').valueAsDate = new Date();
         
         // Initialize
-        loadGymInfo();
-        loadSavedLogo();
-        loadSavedBanner();
+        initGymInfo();
         loadData();
+        loadSavedBanner();
+        loadSavedLogo();
     </script>
 </body>
 </html>
