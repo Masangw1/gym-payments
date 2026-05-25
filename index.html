@@ -29,14 +29,14 @@
             object-position: center;
         }
         .gym-logo {
-            width: 100px;
-            height: 100px;
+            width: 140px;
+            height: 140px;
             object-fit: contain;
-            margin: -50px auto 10px auto;
+            margin: -70px auto 10px auto;
             display: block;
             background: white;
             border-radius: 50%;
-            padding: 10px;
+            padding: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
             z-index: 2;
@@ -58,65 +58,6 @@
             border-radius: 20px;
             font-size: 12px;
             color: #ff6b6b;
-        }
-        
-        /* Admin Settings */
-        .admin-toggle {
-            background: rgba(0,0,0,0.5);
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 12px;
-            color: #888;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .admin-toggle:hover {
-            color: #ff6b6b;
-            background: rgba(0,0,0,0.7);
-        }
-        .admin-panel {
-            display: none;
-            padding: 15px;
-            background: rgba(0,0,0,0.6);
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .admin-panel.active {
-            display: block;
-        }
-        .admin-panel h4 {
-            color: #ff6b6b;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        .admin-panel .form-group {
-            margin-bottom: 12px;
-        }
-        .admin-panel label {
-            color: #ccc;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-        .admin-panel input, .admin-panel textarea {
-            font-size: 13px;
-            padding: 8px;
-            background: rgba(255,255,255,0.9);
-        }
-        .admin-panel textarea {
-            resize: vertical;
-        }
-        .admin-btn {
-            background: #ff6b6b;
-            padding: 8px;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .admin-btn-small {
-            background: rgba(255,255,255,0.2);
-            padding: 6px 10px;
-            font-size: 11px;
-            width: auto;
-            display: inline-block;
-            margin-right: 5px;
         }
         
         /* Tab Styles */
@@ -253,35 +194,10 @@
         <!-- Header with Gym Logo -->
         <div class="header">
             <img id="gymBanner" class="gym-banner" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop" alt="Gym Interior">
-            <img id="gymLogo" class="gym-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E" alt="Gym Logo">
+            <img id="gymLogo" class="gym-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E" alt="Gym Logo">
             <div class="gym-info">
                 <div id="gymDescription" class="gym-description">Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.</div>
                 <div id="gymTagline" class="gym-tagline">🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes</div>
-            </div>
-            
-            <!-- Admin Settings Toggle -->
-            <div class="admin-toggle" onclick="toggleAdminPanel()">⚙️ Admin Settings</div>
-            <div id="adminPanel" class="admin-panel">
-                <h4>🏢 Gym Information Settings</h4>
-                <div class="form-group">
-                    <label>Gym Description</label>
-                    <textarea id="adminDescription" rows="3" placeholder="Enter gym description"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Gym Tagline</label>
-                    <input type="text" id="adminTagline" placeholder="e.g., 🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga Classes">
-                </div>
-                <button class="admin-btn" onclick="saveGymInfo()">💾 Save Gym Info</button>
-                
-                <h4 style="margin-top: 20px;">🖼️ Image Settings</h4>
-                <div class="form-group">
-                    <label>Upload Gym Logo (JPEG/PNG)</label>
-                    <input type="file" id="logoUpload" accept="image/jpeg,image/png,image/jpg">
-                </div>
-                <div>
-                    <button class="admin-btn-small" onclick="changeBannerImage()">🖼️ Change Banner</button>
-                    <button class="admin-btn-small" onclick="resetLogo()">↺ Reset Logo</button>
-                </div>
             </div>
         </div>
 
@@ -444,55 +360,13 @@
         // CLOUDFLARE WORKER URL - UPDATE THIS
         var WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
         
-        var payments = [];
-        var batchCounter = 1;
-        var expenseBatchCounter = 1;
-
-        // ========== ADMIN SETTINGS ==========
-        function toggleAdminPanel() {
-            var panel = document.getElementById('adminPanel');
-            panel.classList.toggle('active');
-            // Load current values into admin form
-            if (panel.classList.contains('active')) {
-                var currentDesc = document.getElementById('gymDescription').innerText;
-                var currentTagline = document.getElementById('gymTagline').innerText;
-                document.getElementById('adminDescription').value = currentDesc;
-                document.getElementById('adminTagline').value = currentTagline;
-            }
-        }
+        // ========== GYM INFORMATION (EDIT THESE VALUES MANUALLY) ==========
+        var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
+        var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
+        // ===================================================================
         
-        function saveGymInfo() {
-            var newDescription = document.getElementById('adminDescription').value;
-            var newTagline = document.getElementById('adminTagline').value;
-            
-            if (newDescription) {
-                document.getElementById('gymDescription').innerText = newDescription;
-                localStorage.setItem('gymDescription', newDescription);
-            }
-            if (newTagline) {
-                document.getElementById('gymTagline').innerText = newTagline;
-                localStorage.setItem('gymTagline', newTagline);
-            }
-            
-            showMessage('message', '✅ Gym information saved!', 'success');
-            // Close admin panel
-            document.getElementById('adminPanel').classList.remove('active');
-        }
-        
-        function loadGymInfo() {
-            var savedDescription = localStorage.getItem('gymDescription');
-            var savedTagline = localStorage.getItem('gymTagline');
-            
-            if (savedDescription) {
-                document.getElementById('gymDescription').innerText = savedDescription;
-            }
-            if (savedTagline) {
-                document.getElementById('gymTagline').innerText = savedTagline;
-            }
-        }
-
-        // ========== GYM LOGO AND IMAGE MANAGEMENT ==========
-        var defaultImages = [
+        // Optional: Banner images (edit this array to change available banners)
+        var BANNER_IMAGES = [
             'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop',
             'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&h=180&fit=crop',
             'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=600&h=180&fit=crop',
@@ -500,48 +374,29 @@
             'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&h=180&fit=crop'
         ];
         
-        function changeBannerImage() {
-            var currentSrc = document.getElementById('gymBanner').src;
-            var currentIndex = defaultImages.indexOf(currentSrc);
-            var nextIndex = (currentIndex + 1) % defaultImages.length;
-            document.getElementById('gymBanner').src = defaultImages[nextIndex];
-            localStorage.setItem('gymBannerImage', defaultImages[nextIndex]);
-            showMessage('message', '✅ Banner image changed!', 'success');
+        var payments = [];
+        var batchCounter = 1;
+        var expenseBatchCounter = 1;
+
+        // ========== INITIALIZE GYM INFO ==========
+        function initGymInfo() {
+            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
+            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
         }
+
+        // ========== GYM LOGO AND IMAGE MANAGEMENT ==========
+        var currentBannerIndex = 0;
         
         function loadSavedImage() {
-            var savedImage = localStorage.getItem('gymBannerImage');
-            if (savedImage) {
-                document.getElementById('gymBanner').src = savedImage;
-            }
             var savedLogo = localStorage.getItem('gymLogo');
             if (savedLogo) {
                 document.getElementById('gymLogo').src = savedLogo;
             }
         }
         
-        // Upload logo from file
-        document.getElementById('logoUpload').addEventListener('change', function(event) {
-            var file = event.target.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var logoUrl = e.target.result;
-                    document.getElementById('gymLogo').src = logoUrl;
-                    localStorage.setItem('gymLogo', logoUrl);
-                    showMessage('message', '✅ Gym logo uploaded successfully!', 'success');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        // Upload logo from file (only accessible via file input - no button visible by default)
+        // To enable logo upload, uncomment the file input in the HTML or use browser dev tools
         
-        function resetLogo() {
-            var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
-            document.getElementById('gymLogo').src = defaultLogo;
-            localStorage.removeItem('gymLogo');
-            showMessage('message', '✅ Logo reset to default!', 'success');
-        }
-
         // ========== TAB SWITCHING ==========
         function switchTab(tab) {
             var tabs = document.querySelectorAll('.tab');
@@ -581,7 +436,7 @@
         function renderTable() {
             var tbody = document.getElementById('tableBody');
             if (payments.length === 0) {
-                tbody.innerHTML = '</table><td colspan="6" style="text-align:center;">No payments</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr>';
                 return;
             }
             var html = '';
@@ -1048,9 +903,9 @@
         document.getElementById('expenseDate').valueAsDate = new Date();
         
         // Initialize
+        initGymInfo();
         loadData();
         loadSavedImage();
-        loadGymInfo();
     </script>
 </body>
 </html>
