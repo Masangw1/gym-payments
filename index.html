@@ -31,25 +31,15 @@
         .gym-logo {
             width: 90px;
             height: 90px;
+            object-fit: contain;
             margin: -45px auto 8px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
             background: white;
             border-radius: 50%;
+            padding: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             position: relative;
             z-index: 2;
-            overflow: hidden;
-        }
-        .gym-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .gym-logo .default-emoji {
-            font-size: 50px;
-            line-height: 1;
         }
         .gym-info {
             padding: 12px 16px 16px;
@@ -120,7 +110,7 @@
             font-size: 16px;
         }
         
-        /* Tabs */
+        /* Tabs - Mobile Friendly */
         .tabs {
             display: flex;
             gap: 8px;
@@ -136,12 +126,13 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
         }
         .tab.active {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
         }
         
-        /* Forms */
+        /* Form Cards - Mobile Optimized */
         .form-card {
             background: white;
             border-radius: 16px;
@@ -165,6 +156,7 @@
             border-radius: 10px;
             font-size: 14px;
             -webkit-appearance: none;
+            appearance: none;
         }
         .row { display: flex; gap: 12px; }
         .row .form-group { flex: 1; }
@@ -180,7 +172,7 @@
             font-weight: 600;
             cursor: pointer;
         }
-        button:disabled { opacity: 0.6; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         
         .message {
             margin-top: 15px;
@@ -235,12 +227,13 @@
             color: #666;
         }
         
-        /* Table */
+        /* Table - Scrollable on Mobile */
         .data-table {
             margin-top: 20px;
             background: white;
             border-radius: 12px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         table {
             width: 100%;
@@ -264,12 +257,10 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header with Gym Logo (Picture Support) -->
+        <!-- Header -->
         <div class="header">
             <img id="gymBanner" class="gym-banner" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop" alt="Gym Interior">
-            <div id="gymLogo" class="gym-logo">
-                <span class="default-emoji">💪</span>
-            </div>
+            <img id="gymLogo" class="gym-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E" alt="Gym Logo">
             <div class="gym-info">
                 <div id="gymDescription" class="gym-description">Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.</div>
                 <div id="gymTagline" class="gym-tagline">🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes</div>
@@ -281,7 +272,7 @@
             <span class="admin-close" onclick="toggleHiddenAdmin()">✕</span>
             <h4>🔧 Admin Settings</h4>
             <div class="form-group">
-                <label style="color:#ccc; font-size:12px;">Upload Logo (JPEG/PNG)</label>
+                <label style="color:#ccc; font-size:12px;">Upload Logo</label>
                 <input type="file" id="adminLogoUpload" accept="image/jpeg,image/png,image/jpg">
             </div>
             <div style="margin-bottom:10px;">
@@ -432,7 +423,7 @@
             <table id="paymentTable">
                 <thead><tr><th>Date</th><th>Type</th><th>Name</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead>
                 <tbody id="tableBody"><tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr></tbody>
-            <table>
+            </table>
         </div>
     </div>
 
@@ -454,33 +445,10 @@
         var batchCounter = 1;
         var expenseBatchCounter = 1;
 
-        // ========== LOGO MANAGEMENT (Picture Support) ==========
-        function setLogoImage(imageDataUrl) {
-            var logoDiv = document.getElementById('gymLogo');
-            logoDiv.innerHTML = '<img src="' + imageDataUrl + '" alt="Gym Logo">';
-            localStorage.setItem('gymLogoData', imageDataUrl);
-        }
-        
-        function resetLogo() {
-            var logoDiv = document.getElementById('gymLogo');
-            logoDiv.innerHTML = '<span class="default-emoji">💪</span>';
-            localStorage.removeItem('gymLogoData');
-            showMessage('message', '✅ Logo reset to default!', 'success');
-        }
-        
-        function loadSavedLogo() {
-            var savedLogo = localStorage.getItem('gymLogoData');
-            if (savedLogo) {
-                var logoDiv = document.getElementById('gymLogo');
-                logoDiv.innerHTML = '<img src="' + savedLogo + '" alt="Gym Logo">';
-            }
-        }
-
-        // ========== ADMIN PANEL ==========
+        // Admin Panel
         function toggleHiddenAdmin() {
-            var panel = document.getElementById('hiddenAdmin');
-            panel.classList.toggle('active');
-            if (panel.classList.contains('active')) {
+            document.getElementById('hiddenAdmin').classList.toggle('active');
+            if (document.getElementById('hiddenAdmin').classList.contains('active')) {
                 document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
                 document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
             }
@@ -489,8 +457,8 @@
         function saveGymInfo() {
             var newDescription = document.getElementById('adminDescription').value;
             var newTagline = document.getElementById('adminTagline').value;
-            if (newDescription) { document.getElementById('gymDescription').innerText = newDescription; }
-            if (newTagline) { document.getElementById('gymTagline').innerText = newTagline; }
+            if (newDescription) { document.getElementById('gymDescription').innerText = newDescription; GYM_DESCRIPTION = newDescription; }
+            if (newTagline) { document.getElementById('gymTagline').innerText = newTagline; GYM_TAGLINE = newTagline; }
             showMessage('message', '✅ Gym information saved!', 'success');
             toggleHiddenAdmin();
         }
@@ -507,30 +475,37 @@
             showMessage('message', '✅ Banner changed!', 'success');
         }
         
-        function loadSavedBanner() {
+        function loadSavedImage() {
             var savedImage = localStorage.getItem('gymBannerImage');
             if (savedImage) { document.getElementById('gymBanner').src = savedImage; }
+            var savedLogo = localStorage.getItem('gymLogo');
+            if (savedLogo) { document.getElementById('gymLogo').src = savedLogo; }
         }
         
-        // Logo upload handler
-        document.getElementById('adminLogoUpload').addEventListener('change', function(event) {
-            var file = event.target.files[0];
+        document.getElementById('adminLogoUpload').addEventListener('change', function(e) {
+            var file = e.target.files[0];
             if (file) {
                 var reader = new FileReader();
-                reader.onload = function(e) {
-                    setLogoImage(e.target.result);
+                reader.onload = function(ev) {
+                    document.getElementById('gymLogo').src = ev.target.result;
+                    localStorage.setItem('gymLogo', ev.target.result);
                     showMessage('message', '✅ Logo uploaded!', 'success');
                 };
                 reader.readAsDataURL(file);
             }
         });
         
-        // Keyboard shortcut
+        function resetLogo() {
+            var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
+            document.getElementById('gymLogo').src = defaultLogo;
+            localStorage.removeItem('gymLogo');
+            showMessage('message', '✅ Logo reset!', 'success');
+        }
+        
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); toggleHiddenAdmin(); }
         });
         
-        // ========== TAB SWITCHING ==========
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.form-card').forEach(f => f.classList.remove('active'));
@@ -543,7 +518,6 @@
             }
         }
         
-        // ========== PAYMENT FUNCTIONS ==========
         function loadData() {
             var saved = localStorage.getItem('gymPayments');
             if (saved) { payments = JSON.parse(saved); }
@@ -651,7 +625,6 @@
             document.getElementById('batchEntries').innerHTML = ''; batchCounter = 1; document.getElementById('batchForm').classList.remove('active');
         }
         
-        // ========== EXPENSE FUNCTIONS ==========
         function determineCategoryFromNote(note) {
             if (!note) return 'Other';
             var l = note.toLowerCase();
@@ -744,16 +717,13 @@
             setTimeout(function() { d.className = 'message'; }, 4000);
         }
         
-        // Set default dates
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('month').value = new Date().toISOString().slice(0,7);
         document.getElementById('expenseDate').valueAsDate = new Date();
         
-        // Initialize
         initGymInfo();
         loadData();
-        loadSavedBanner();
-        loadSavedLogo();
+        loadSavedImage();
     </script>
 </body>
 </html>
