@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gym Management Portal</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -10,70 +10,73 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
-            padding: 12px;
+            padding: 20px;
         }
         .container { max-width: 600px; margin: 0 auto; }
         
-        /* Header - Mobile Optimized */
+        /* Header with Image */
         .header {
             text-align: center;
             background: rgba(255,255,255,0.1);
-            border-radius: 16px;
-            margin-bottom: 16px;
+            border-radius: 20px;
+            margin-bottom: 30px;
             overflow: hidden;
         }
         .gym-banner {
             width: 100%;
-            height: 140px;
+            height: 180px;
             object-fit: cover;
             object-position: center;
         }
         .gym-logo {
-            width: 90px;
-            height: 90px;
+            width: 140px;
+            height: 140px;
             object-fit: contain;
-            margin: -45px auto 8px auto;
+            margin: -70px auto 10px auto;
             display: block;
             background: white;
             border-radius: 50%;
-            padding: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
             z-index: 2;
         }
         .gym-info {
-            padding: 12px 16px 16px;
+            padding: 20px;
+            padding-top: 10px;
         }
         .gym-description {
             color: #ccc;
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
         }
         .gym-tagline {
             display: inline-block;
             background: rgba(255,107,107,0.2);
-            padding: 4px 12px;
+            padding: 5px 15px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 12px;
             color: #ff6b6b;
         }
         
-        /* Hidden Admin Panel */
+        /* Hidden Admin Panel - Access via Ctrl+Shift+A */
         .hidden-admin {
             display: none;
             position: fixed;
-            bottom: 10px;
-            right: 10px;
-            left: 10px;
+            bottom: 20px;
+            right: 20px;
             background: #1a1a2e;
             border: 1px solid #ff6b6b;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 15px;
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            max-width: 250px;
         }
-        .hidden-admin.active { display: block; }
+        .hidden-admin.active {
+            display: block;
+        }
         .hidden-admin h4 {
             color: #ff6b6b;
             margin-bottom: 10px;
@@ -81,49 +84,51 @@
         }
         .hidden-admin .admin-btn {
             background: #ff6b6b;
-            padding: 8px 12px;
-            font-size: 13px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 5px;
             margin-top: 5px;
             width: 100%;
         }
         .hidden-admin .admin-btn-small {
             background: rgba(255,255,255,0.2);
-            padding: 6px 12px;
-            font-size: 12px;
+            padding: 4px 8px;
+            font-size: 11px;
             margin-right: 5px;
             width: auto;
             display: inline-block;
         }
-        .hidden-admin input, .hidden-admin textarea {
-            padding: 8px;
-            font-size: 13px;
+        .hidden-admin input {
+            padding: 6px;
+            font-size: 12px;
             margin-bottom: 8px;
-            width: 100%;
         }
         .admin-close {
             position: absolute;
-            top: 8px;
-            right: 12px;
+            top: 5px;
+            right: 10px;
             color: #888;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
+        }
+        .admin-close:hover {
+            color: #ff6b6b;
         }
         
-        /* Tabs - Mobile Friendly */
+        /* Tab Styles */
         .tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .tab {
             flex: 1;
-            padding: 12px 8px;
+            padding: 12px;
             background: rgba(255,255,255,0.1);
             border: none;
             border-radius: 10px;
             color: white;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -132,132 +137,116 @@
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
         }
         
-        /* Form Cards - Mobile Optimized */
         .form-card {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             display: none;
         }
-        .form-card.active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        label {
+        .form-card.active {
             display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #333;
-            font-size: 14px;
         }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
         input, select, textarea {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 14px;
-            -webkit-appearance: none;
-            appearance: none;
+            font-size: 16px;
         }
-        .row { display: flex; gap: 12px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #ff6b6b; }
+        .row { display: flex; gap: 15px; }
         .row .form-group { flex: 1; }
-        
         button {
             width: 100%;
             padding: 14px;
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
         }
+        button:hover { transform: translateY(-2px); }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
-        
         .message {
-            margin-top: 15px;
-            padding: 10px;
+            margin-top: 20px;
+            padding: 12px;
             border-radius: 10px;
             display: none;
-            font-size: 13px;
         }
         .message.success { background: #d4edda; color: #155724; display: block; }
         .message.error { background: #f8d7da; color: #721c24; display: block; }
-        
         .batch-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px dashed #e0e0e0;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #e0e0e0;
         }
         .batch-toggle {
             background: #f8f9fa;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
             border-radius: 10px;
             cursor: pointer;
             color: #ff6b6b;
             font-weight: 600;
-            font-size: 14px;
         }
-        .batch-form { display: none; margin-top: 15px; }
+        .batch-form { display: none; margin-top: 20px; }
         .batch-form.active { display: block; }
         .batch-entry {
             background: #f8f9fa;
-            padding: 12px;
+            padding: 15px;
             border-radius: 10px;
-            margin-bottom: 12px;
-            border-left: 3px solid #ff6b6b;
+            margin-bottom: 15px;
+            border-left: 4px solid #ff6b6b;
         }
         .remove-btn {
             background: #dc3545;
-            padding: 6px 10px;
-            font-size: 12px;
-            margin-top: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-top: 10px;
             width: auto;
         }
-        .add-btn { background: #28a745; margin-bottom: 12px; }
-        
+        .add-btn { background: #28a745; margin-bottom: 15px; }
         .stats {
             text-align: center;
-            padding: 12px;
+            padding: 15px;
             background: #f8f9fa;
             border-radius: 10px;
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        /* Table - Scrollable on Mobile */
-        .data-table {
             margin-top: 20px;
-            background: white;
-            border-radius: 12px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 500px;
-        }
-        th, td {
-            padding: 10px 8px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 12px;
-        }
-        th { background: #ff6b6b; color: white; }
-        
-        .category-hint {
-            font-size: 11px;
+            font-size: 14px;
             color: #666;
-            margin-top: 4px;
+        }
+        .status-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            margin-right: 8px;
+        }
+        .data-table {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; font-size: 12px; }
+        th { background: #ff6b6b; color: white; }
+        .category-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Header with Gym Logo -->
         <div class="header">
             <img id="gymBanner" class="gym-banner" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop" alt="Gym Interior">
             <img id="gymLogo" class="gym-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E" alt="Gym Logo">
@@ -267,28 +256,28 @@
             </div>
         </div>
 
-        <!-- Hidden Admin Panel (Ctrl+Shift+A) -->
+        <!-- Hidden Admin Panel (Press Ctrl+Shift+A to toggle) -->
         <div id="hiddenAdmin" class="hidden-admin">
             <span class="admin-close" onclick="toggleHiddenAdmin()">✕</span>
             <h4>🔧 Admin Settings</h4>
             <div class="form-group">
-                <label style="color:#ccc; font-size:12px;">Upload Logo</label>
+                <label style="color:#ccc; font-size:11px;">Upload Logo</label>
                 <input type="file" id="adminLogoUpload" accept="image/jpeg,image/png,image/jpg">
             </div>
-            <div style="margin-bottom:10px;">
+            <div>
                 <button class="admin-btn-small" onclick="resetLogo()">Reset Logo</button>
                 <button class="admin-btn-small" onclick="changeBannerImage()">Next Banner</button>
             </div>
-            <div class="form-group">
-                <label style="color:#ccc; font-size:12px;">Gym Description</label>
-                <textarea id="adminDescription" rows="2" style="font-size:12px;"></textarea>
+            <div class="form-group" style="margin-top:10px;">
+                <label style="color:#ccc; font-size:11px;">Gym Description</label>
+                <textarea id="adminDescription" rows="2" style="font-size:11px;"></textarea>
             </div>
             <div class="form-group">
-                <label style="color:#ccc; font-size:12px;">Gym Tagline</label>
-                <input type="text" id="adminTagline" style="font-size:12px;">
+                <label style="color:#ccc; font-size:11px;">Gym Tagline</label>
+                <input type="text" id="adminTagline" style="font-size:11px;">
             </div>
             <button class="admin-btn" onclick="saveGymInfo()">Save Changes</button>
-            <button class="admin-btn" style="margin-top:8px; background:#333;" onclick="toggleHiddenAdmin()">Close</button>
+            <button class="admin-btn" style="margin-top:5px; background:#333;" onclick="toggleHiddenAdmin()">Close</button>
         </div>
 
         <!-- Tabs -->
@@ -297,9 +286,10 @@
             <button class="tab" onclick="switchTab('expense')">📝 Expenses</button>
         </div>
 
-        <!-- PAYMENT FORM -->
+        <!-- ========== PAYMENT FORM ========== -->
         <div id="paymentForm" class="form-card active">
             <div id="message" class="message"></div>
+            
             <form id="paymentEntryForm">
                 <div class="row">
                     <div class="form-group">
@@ -316,16 +306,18 @@
                         <input type="date" id="date" required>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="form-group">
                         <label>Member/Guest Name *</label>
                         <input type="text" id="memberName" placeholder="John Doe" required>
                     </div>
                     <div class="form-group">
-                        <label>Member ID</label>
-                        <input type="text" id="memberId" placeholder="Auto-assigned">
+                        <label>Member ID (Optional)</label>
+                        <input type="text" id="memberId" placeholder="Leave blank - auto-assigned">
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="form-group">
                         <label>Amount *</label>
@@ -340,6 +332,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="form-group">
                         <label>Month *</label>
@@ -347,15 +340,18 @@
                     </div>
                     <div class="form-group">
                         <label>Class Type</label>
-                        <input type="text" id="classType" placeholder="Aerobics / Yoga">
+                        <input type="text" id="classType" placeholder="Aerobics / Yoga / Spin">
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Notes</label>
-                    <input type="text" id="notes" placeholder="Optional">
+                    <input type="text" id="notes" placeholder="Optional notes">
                 </div>
+
                 <button type="submit" id="submitBtn">💾 Save Payment</button>
             </form>
+
             <div class="batch-section">
                 <div class="batch-toggle" onclick="toggleBatch()">📦 Batch Entry</div>
                 <div id="batchForm" class="batch-form">
@@ -364,14 +360,16 @@
                     <button type="button" onclick="submitBatch()">💾 Save All</button>
                 </div>
             </div>
+
             <div class="stats">
                 <span class="status-badge"></span> <span id="paymentCount">0</span> payments recorded
             </div>
         </div>
 
-        <!-- EXPENSE FORM -->
+        <!-- ========== EXPENSE FORM ========== -->
         <div id="expenseForm" class="form-card">
             <div id="expenseMessage" class="message"></div>
+            
             <form id="expenseEntryForm">
                 <div class="row">
                     <div class="form-group">
@@ -380,14 +378,18 @@
                     </div>
                     <div class="form-group">
                         <label>Vendor</label>
-                        <input type="text" id="vendor" placeholder="Who was paid">
+                        <input type="text" id="vendor" placeholder="Optional - who was paid">
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Description / Note *</label>
-                    <input type="text" id="expenseNote" placeholder="e.g., water bill, salaries" required>
-                    <div class="category-hint">💡 Keywords: water, electricity, mop, rent, salary, marketing</div>
+                    <input type="text" id="expenseNote" placeholder="e.g., water bill, mop, salaries, rent (May)" required>
+                    <div class="category-hint">
+                        💡 Keywords: water, electricity, mop, rent, salary, marketing, maintenance, equipment
+                    </div>
                 </div>
+
                 <div class="row">
                     <div class="form-group">
                         <label>Amount *</label>
@@ -395,26 +397,32 @@
                     </div>
                     <div class="form-group">
                         <label>Receipt Link</label>
-                        <input type="text" id="receiptLink" placeholder="Google Drive URL">
+                        <input type="text" id="receiptLink" placeholder="Optional - Google Drive URL">
                     </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Split Amounts</label>
-                    <input type="text" id="splitAmounts" placeholder="e.g., 6000+50000">
-                    <div class="category-hint">First amount (6000) = Gym Attendant Meals</div>
+                    <label>Split Amount (if multiple expenses)</label>
+                    <input type="text" id="splitAmounts" placeholder="e.g., 6000+50000 (first is meals, rest are other)">
+                    <div class="category-hint">
+                        💡 For split expenses: first amount (6000) = Gym Attendant Meals, remaining = described in Note
+                    </div>
                 </div>
+
                 <button type="submit" id="expenseSubmitBtn">💾 Save Expense</button>
             </form>
+
             <div class="batch-section">
                 <div class="batch-toggle" onclick="toggleExpenseBatch()">📦 Batch Expense Entry</div>
                 <div id="expenseBatchForm" class="batch-form">
                     <div id="expenseBatchEntries"></div>
                     <button type="button" class="add-btn" onclick="addExpenseBatchEntry()">+ Add Expense</button>
-                    <button type="button" onclick="submitExpenseBatch()">💾 Save All</button>
+                    <button type="button" onclick="submitExpenseBatch()">💾 Save All Expenses</button>
                 </div>
             </div>
+
             <div class="stats">
-                <span class="status-badge"></span> Auto-categorization: Rent, Utilities, Payroll, Cleaning, Other
+                <span class="status-badge"></span> Categories auto-detected: Rent, Utilities, Payroll, Cleaning, Marketing, Maintenance, Other
             </div>
         </div>
 
@@ -428,11 +436,15 @@
     </div>
 
     <script>
+        // CLOUDFLARE WORKER URL - UPDATE THIS
         var WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
         
+        // ========== GYM INFORMATION (EDIT THESE VALUES MANUALLY) ==========
         var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
         var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
+        // ===================================================================
         
+        // Banner images array
         var BANNER_IMAGES = [
             'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=180&fit=crop',
             'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&h=180&fit=crop',
@@ -441,14 +453,17 @@
             'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&h=180&fit=crop'
         ];
         var currentBannerIndex = 0;
+        
         var payments = [];
         var batchCounter = 1;
         var expenseBatchCounter = 1;
 
-        // Admin Panel
+        // ========== HIDDEN ADMIN PANEL ==========
         function toggleHiddenAdmin() {
-            document.getElementById('hiddenAdmin').classList.toggle('active');
-            if (document.getElementById('hiddenAdmin').classList.contains('active')) {
+            var panel = document.getElementById('hiddenAdmin');
+            panel.classList.toggle('active');
+            if (panel.classList.contains('active')) {
+                // Load current values into admin form
                 document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
                 document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
             }
@@ -457,39 +472,60 @@
         function saveGymInfo() {
             var newDescription = document.getElementById('adminDescription').value;
             var newTagline = document.getElementById('adminTagline').value;
-            if (newDescription) { document.getElementById('gymDescription').innerText = newDescription; GYM_DESCRIPTION = newDescription; }
-            if (newTagline) { document.getElementById('gymTagline').innerText = newTagline; GYM_TAGLINE = newTagline; }
+            
+            if (newDescription) {
+                document.getElementById('gymDescription').innerText = newDescription;
+                GYM_DESCRIPTION = newDescription;
+            }
+            if (newTagline) {
+                document.getElementById('gymTagline').innerText = newTagline;
+                GYM_TAGLINE = newTagline;
+            }
+            
             showMessage('message', '✅ Gym information saved!', 'success');
-            toggleHiddenAdmin();
         }
         
         function initGymInfo() {
             document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
             document.getElementById('gymTagline').innerText = GYM_TAGLINE;
         }
-        
+
+        // ========== GYM LOGO AND IMAGE MANAGEMENT ==========
         function changeBannerImage() {
             currentBannerIndex = (currentBannerIndex + 1) % BANNER_IMAGES.length;
             document.getElementById('gymBanner').src = BANNER_IMAGES[currentBannerIndex];
             localStorage.setItem('gymBannerImage', BANNER_IMAGES[currentBannerIndex]);
-            showMessage('message', '✅ Banner changed!', 'success');
+            showMessage('message', '✅ Banner image changed!', 'success');
         }
         
         function loadSavedImage() {
             var savedImage = localStorage.getItem('gymBannerImage');
-            if (savedImage) { document.getElementById('gymBanner').src = savedImage; }
+            if (savedImage) {
+                document.getElementById('gymBanner').src = savedImage;
+                // Find index
+                for (var i = 0; i < BANNER_IMAGES.length; i++) {
+                    if (BANNER_IMAGES[i] === savedImage) {
+                        currentBannerIndex = i;
+                        break;
+                    }
+                }
+            }
             var savedLogo = localStorage.getItem('gymLogo');
-            if (savedLogo) { document.getElementById('gymLogo').src = savedLogo; }
+            if (savedLogo) {
+                document.getElementById('gymLogo').src = savedLogo;
+            }
         }
         
-        document.getElementById('adminLogoUpload').addEventListener('change', function(e) {
-            var file = e.target.files[0];
+        // Admin logo upload
+        document.getElementById('adminLogoUpload').addEventListener('change', function(event) {
+            var file = event.target.files[0];
             if (file) {
                 var reader = new FileReader();
-                reader.onload = function(ev) {
-                    document.getElementById('gymLogo').src = ev.target.result;
-                    localStorage.setItem('gymLogo', ev.target.result);
-                    showMessage('message', '✅ Logo uploaded!', 'success');
+                reader.onload = function(e) {
+                    var logoUrl = e.target.result;
+                    document.getElementById('gymLogo').src = logoUrl;
+                    localStorage.setItem('gymLogo', logoUrl);
+                    showMessage('message', '✅ Gym logo uploaded!', 'success');
                 };
                 reader.readAsDataURL(file);
             }
@@ -499,63 +535,105 @@
             var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
             document.getElementById('gymLogo').src = defaultLogo;
             localStorage.removeItem('gymLogo');
-            showMessage('message', '✅ Logo reset!', 'success');
+            showMessage('message', '✅ Logo reset to default!', 'success');
         }
-        
+
+        // Keyboard shortcut: Ctrl+Shift+A to open admin panel
         document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); toggleHiddenAdmin(); }
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                e.preventDefault();
+                toggleHiddenAdmin();
+            }
         });
-        
+
+        // ========== TAB SWITCHING ==========
         function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.form-card').forEach(f => f.classList.remove('active'));
+            var tabs = document.querySelectorAll('.tab');
+            var forms = document.querySelectorAll('.form-card');
+            
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            forms.forEach(function(f) { f.classList.remove('active'); });
+            
             if (tab === 'payment') {
-                document.querySelector('.tab:first-child').classList.add('active');
+                tabs[0].classList.add('active');
                 document.getElementById('paymentForm').classList.add('active');
             } else {
-                document.querySelector('.tab:last-child').classList.add('active');
+                tabs[1].classList.add('active');
                 document.getElementById('expenseForm').classList.add('active');
             }
         }
-        
+
+        // ========== PAYMENT FUNCTIONS ==========
         function loadData() {
             var saved = localStorage.getItem('gymPayments');
-            if (saved) { payments = JSON.parse(saved); }
+            if (saved) {
+                payments = JSON.parse(saved);
+            }
             renderTable();
             updateStats();
         }
-        
-        function saveData() { localStorage.setItem('gymPayments', JSON.stringify(payments)); updateStats(); }
-        function updateStats() { document.getElementById('paymentCount').innerText = payments.length; }
-        
+
+        function saveData() {
+            localStorage.setItem('gymPayments', JSON.stringify(payments));
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('paymentCount').innerText = payments.length;
+        }
+
         function renderTable() {
             var tbody = document.getElementById('tableBody');
-            if (payments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No payments</td></tr>'; return; }
+            if (payments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr>';
+                return;
+            }
             var html = '';
             for (var i = payments.length - 1; i >= 0; i--) {
                 var p = payments[i];
-                html += '<tr><td>' + p.date + '</td><td>' + p.paymentType + '</td><td>' + p.memberName + '</td><td>' + p.amount + '</td><td>' + p.paymentMethod + '</td><td>' + p.month + '</td></tr>';
+                html += '<tr>';
+                html += '<td>' + p.date + '</td>';
+                html += '<td>' + p.paymentType + '</td>';
+                html += '<td>' + p.memberName + '</td>';
+                html += '<td>' + p.amount + '</td>';
+                html += '<td>' + p.paymentMethod + '</td>';
+                html += '<td>' + p.month + '</td>';
+                html += '</tr>';
             }
             tbody.innerHTML = html;
         }
-        
+
         function saveToGoogleSheets(data) {
             return fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
-            }).then(r => r.json()).then(r => { if (!r.success) throw new Error(r.error); return r; });
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (!result.success) {
+                    throw new Error(result.error || 'Unknown error');
+                }
+                return result;
+            });
         }
-        
+
+        // Payment submission
         document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
             var memberName = document.getElementById('memberName').value;
             var classType = document.getElementById('classType').value;
-            var displayName = classType ? memberName + ' (' + classType + ')' : memberName;
+            var displayName = memberName;
+            if (classType) {
+                displayName = memberName + ' (' + classType + ')';
+            }
+            var memberId = document.getElementById('memberId').value;
+            
             var payment = {
                 date: document.getElementById('date').value,
                 paymentType: document.getElementById('paymentType').value,
-                memberId: document.getElementById('memberId').value || '',
+                memberId: memberId || '',
                 memberName: displayName,
                 amount: parseFloat(document.getElementById('amount').value),
                 paymentMethod: document.getElementById('paymentMethod').value,
@@ -563,164 +641,417 @@
                 notes: document.getElementById('notes').value || '',
                 type: 'payment'
             };
+            
             var btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.textContent = 'Saving...';
-            saveToGoogleSheets(payment).then(function(r) {
-                payments.push(payment); saveData(); renderTable();
-                showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount, 'success');
-                document.getElementById('paymentEntryForm').reset();
-                document.getElementById('date').valueAsDate = new Date();
-                document.getElementById('month').value = new Date().toISOString().slice(0,7);
-            }).catch(function(err) { showMessage('message', '❌ Error: ' + err.message, 'error');
-            }).finally(function() { btn.disabled = false; btn.textContent = '💾 Save Payment'; });
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
+            saveToGoogleSheets(payment)
+                .then(function(result) {
+                    payments.push(payment);
+                    saveData();
+                    renderTable();
+                    var memberMsg = result.memberId ? ' (Member: ' + result.memberId + ')' : '';
+                    showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount + memberMsg, 'success');
+                    
+                    document.getElementById('paymentEntryForm').reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+                    document.getElementById('memberId').value = '';
+                    document.getElementById('classType').value = '';
+                    document.getElementById('notes').value = '';
+                })
+                .catch(function(error) {
+                    showMessage('message', '❌ Error: ' + error.message, 'error');
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.textContent = '💾 Save Payment';
+                });
         });
-        
+
+        // Payment batch functions
         function toggleBatch() {
-            var bf = document.getElementById('batchForm');
-            bf.classList.toggle('active');
-            if (bf.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) addBatchEntry();
-        }
-        
-        function addBatchEntry() {
-            var c = document.getElementById('batchEntries');
-            var id = batchCounter;
-            var today = new Date().toISOString().slice(0,10);
-            var cm = new Date().toISOString().slice(0,7);
-            var div = document.createElement('div');
-            div.className = 'batch-entry'; div.id = 'batch-' + id;
-            div.innerHTML = '<h4>Payment #' + id + '</h4><div class="row"><div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div><div class="form-group"><label>Type</label><select class="batch-type"><option>Monthly Subscription</option><option>Drop-in</option><option>Class Fee</option><option>Late Fee</option></select></div></div><div class="row"><div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Name"></div><div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div></div><div class="row"><div class="form-group"><label>Method</label><select class="batch-method"><option>Cash</option><option>Airtel Money</option><option>Bank Transfer</option></select></div><div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + cm + '"></div></div><button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
-            c.appendChild(div);
-            batchCounter++;
-        }
-        
-        function removeBatchEntry(id) { var e = document.getElementById('batch-' + id); if (e) e.remove(); }
-        
-        async function submitBatch() {
-            var entries = document.querySelectorAll('.batch-entry');
-            var saved = 0, failed = 0, toSave = [];
-            for (var i = 0; i < entries.length; i++) {
-                var e = entries[i];
-                var name = e.querySelector('.batch-name').value;
-                var amt = e.querySelector('.batch-amount').value;
-                if (name && amt) {
-                    toSave.push({
-                        date: e.querySelector('.batch-date').value,
-                        paymentType: e.querySelector('.batch-type').value,
-                        memberId: '',
-                        memberName: name.trim(),
-                        amount: parseFloat(amt),
-                        paymentMethod: e.querySelector('.batch-method').value,
-                        month: e.querySelector('.batch-month').value,
-                        notes: 'Batch entry',
-                        type: 'payment'
-                    });
+            var batchForm = document.getElementById('batchForm');
+            if (batchForm.classList.contains('active')) {
+                batchForm.classList.remove('active');
+            } else {
+                batchForm.classList.add('active');
+                if (document.getElementById('batchEntries').children.length === 0) {
+                    addBatchEntry();
                 }
             }
-            if (toSave.length === 0) { showMessage('message', 'No valid entries', 'error'); return; }
-            showMessage('message', 'Saving ' + toSave.length + ' payments...', 'success');
-            for (var i = 0; i < toSave.length; i++) {
-                try { await saveToGoogleSheets(toSave[i]); saved++; payments.push(toSave[i]); } catch(e) { failed++; }
-            }
-            if (saved > 0) { saveData(); renderTable(); showMessage('message', '✅ Saved ' + saved + ' payments!', 'success'); }
-            document.getElementById('batchEntries').innerHTML = ''; batchCounter = 1; document.getElementById('batchForm').classList.remove('active');
         }
+
+        function addBatchEntry() {
+            var container = document.getElementById('batchEntries');
+            var id = batchCounter;
+            var today = new Date().toISOString().slice(0,10);
+            var currentMonth = new Date().toISOString().slice(0,7);
+            var entryDiv = document.createElement('div');
+            entryDiv.className = 'batch-entry';
+            entryDiv.id = 'batch-' + id;
+            entryDiv.innerHTML = '<h4>Payment #' + id + '</h4>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div>' +
+                    '<div class="form-group"><label>Type</label>' +
+                        '<select class="batch-type">' +
+                            '<option value="Monthly Subscription">Monthly Subscription</option>' +
+                            '<option value="Drop-in">Drop-in</option>' +
+                            '<option value="Class Fee">Class Fee</option>' +
+                            '<option value="Late Fee">Late Fee</option>' +
+                        '</select>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>' +
+                    '<div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Method</label>' +
+                        '<select class="batch-method">' +
+                            '<option value="Cash">Cash</option>' +
+                            '<option value="Airtel Money">Airtel Money</option>' +
+                            '<option value="Bank Transfer">Bank Transfer</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + currentMonth + '"></div>' +
+                '</div>' +
+                '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
+            container.appendChild(entryDiv);
+            batchCounter++;
+        }
+
+        function removeBatchEntry(id) {
+            var element = document.getElementById('batch-' + id);
+            if (element) element.remove();
+        }
+
+        async function submitBatch() {
+            var batchEntries = document.querySelectorAll('.batch-entry');
+            var saved = 0;
+            var failed = 0;
+            var paymentsToSave = [];
+            
+            for (var i = 0; i < batchEntries.length; i++) {
+                var entry = batchEntries[i];
+                var name = entry.querySelector('.batch-name').value;
+                var amount = entry.querySelector('.batch-amount').value;
+                
+                if (name && amount) {
+                    var payment = {
+                        date: entry.querySelector('.batch-date').value,
+                        paymentType: entry.querySelector('.batch-type').value,
+                        memberId: '',
+                        memberName: name.trim(),
+                        amount: parseFloat(amount),
+                        paymentMethod: entry.querySelector('.batch-method').value,
+                        month: entry.querySelector('.batch-month').value,
+                        notes: 'Batch entry',
+                        type: 'payment'
+                    };
+                    paymentsToSave.push(payment);
+                }
+            }
+            
+            if (paymentsToSave.length === 0) {
+                showMessage('message', 'No valid entries to save', 'error');
+                return;
+            }
+            
+            showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
+            
+            for (var i = 0; i < paymentsToSave.length; i++) {
+                var payment = paymentsToSave[i];
+                try {
+                    var result = await saveToGoogleSheets(payment);
+                    saved++;
+                    payments.push(payment);
+                    if (saved < paymentsToSave.length) {
+                        showMessage('message', 'Saved ' + saved + ' of ' + paymentsToSave.length + '...', 'success');
+                    }
+                } catch(error) {
+                    failed++;
+                }
+            }
+            
+            if (saved > 0) {
+                saveData();
+                renderTable();
+                var msg = '✅ Saved ' + saved + ' payment(s)!';
+                if (failed > 0) msg = msg + ' (' + failed + ' failed)';
+                showMessage('message', msg, 'success');
+            } else {
+                showMessage('message', 'No payments were saved', 'error');
+            }
+            
+            document.getElementById('batchEntries').innerHTML = '';
+            batchCounter = 1;
+            document.getElementById('batchForm').classList.remove('active');
+        }
+
+        // ========== EXPENSE FUNCTIONS ==========
         
         function determineCategoryFromNote(note) {
             if (!note) return 'Other';
-            var l = note.toLowerCase();
-            if (l.indexOf('mop') > -1) return 'Cleaning';
-            if (l.indexOf('water') > -1) return 'Utilities';
-            if (l.indexOf('electric') > -1) return 'Utilities';
-            if (l.indexOf('rent') > -1) return 'Rent';
-            if (l.indexOf('salary') > -1 || l.indexOf('payroll') > -1) return 'Payroll';
-            if (l.indexOf('marketing') > -1) return 'Marketing';
-            if (l.indexOf('cleaning') > -1) return 'Cleaning';
-            if (l.indexOf('maintenance') > -1 || l.indexOf('repair') > -1) return 'Maintenance';
+            var lowerNote = note.toLowerCase();
+            
+            if (lowerNote.indexOf('mop') > -1) return 'Cleaning';
+            if (lowerNote.indexOf('water') > -1) return 'Utilities';
+            if (lowerNote.indexOf('electric') > -1 || lowerNote.indexOf('electricity') > -1) return 'Utilities';
+            if (lowerNote.indexOf('rent') > -1) return 'Rent';
+            if (lowerNote.indexOf('salary') > -1 || lowerNote.indexOf('payroll') > -1) return 'Payroll';
+            if (lowerNote.indexOf('marketing') > -1 || lowerNote.indexOf('advert') > -1) return 'Marketing';
+            if (lowerNote.indexOf('cleaning') > -1) return 'Cleaning';
+            if (lowerNote.indexOf('maintenance') > -1 || lowerNote.indexOf('repair') > -1) return 'Maintenance';
+            if (lowerNote.indexOf('equipment') > -1) return 'Equipment';
+            
             return 'Other';
         }
         
-        function parseSplit(s) { if (!s) return null; var p = s.split('+'), a = []; for (var i=0;i<p.length;i++) { var n=parseFloat(p[i]); if(!isNaN(n) && n>0) a.push(n); } return a.length? a : null; }
+        function parseSplitAmounts(splitStr) {
+            if (!splitStr) return null;
+            var parts = splitStr.split('+');
+            var amounts = [];
+            for (var i = 0; i < parts.length; i++) {
+                var amt = parseFloat(parts[i]);
+                if (!isNaN(amt) && amt > 0) amounts.push(amt);
+            }
+            return amounts.length > 0 ? amounts : null;
+        }
         
+        // Single expense submission
         document.getElementById('expenseEntryForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            var note = document.getElementById('expenseNote').value;
-            var amount = parseFloat(document.getElementById('expenseAmount').value);
-            var splits = parseSplit(document.getElementById('splitAmounts').value);
+            
+            var expenseNote = document.getElementById('expenseNote').value;
+            var expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+            var splitAmounts = document.getElementById('splitAmounts').value;
+            
             var btn = document.getElementById('expenseSubmitBtn');
-            btn.disabled = true; btn.textContent = 'Saving...';
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
+            var splits = parseSplitAmounts(splitAmounts);
+            
             if (splits && splits.length > 0) {
                 var promises = [];
-                if (splits[0] === 6000) promises.push(saveToGoogleSheets({ date: document.getElementById('expenseDate').value, vendor: document.getElementById('vendor').value || '', description: 'Gym Attendant Meals', category: 'Payroll', amount: splits[0], receiptLink: document.getElementById('receiptLink').value || '', month: document.getElementById('expenseDate').value.substring(0,7), type: 'expense' }));
-                for (var i=1;i<splits.length;i++) promises.push(saveToGoogleSheets({ date: document.getElementById('expenseDate').value, vendor: document.getElementById('vendor').value || '', description: note, category: determineCategoryFromNote(note), amount: splits[i], receiptLink: document.getElementById('receiptLink').value || '', month: document.getElementById('expenseDate').value.substring(0,7), type: 'expense' }));
-                Promise.all(promises).then(function() { showMessage('expenseMessage', '✅ Saved!', 'success'); document.getElementById('expenseEntryForm').reset(); document.getElementById('expenseDate').valueAsDate = new Date(); }).catch(function(err) { showMessage('expenseMessage', '❌ Error', 'error'); }).finally(function() { btn.disabled = false; btn.textContent = '💾 Save Expense'; });
+                var firstAmount = splits[0];
+                var remainingAmounts = splits.slice(1);
+                
+                if (firstAmount === 6000) {
+                    promises.push(saveToGoogleSheets({
+                        date: document.getElementById('expenseDate').value,
+                        vendor: document.getElementById('vendor').value || '',
+                        description: 'Gym Attendant Meals',
+                        category: 'Payroll',
+                        amount: firstAmount,
+                        receiptLink: document.getElementById('receiptLink').value || '',
+                        month: document.getElementById('expenseDate').value.substring(0, 7),
+                        type: 'expense'
+                    }));
+                }
+                
+                for (var i = 0; i < remainingAmounts.length; i++) {
+                    var category = determineCategoryFromNote(expenseNote);
+                    promises.push(saveToGoogleSheets({
+                        date: document.getElementById('expenseDate').value,
+                        vendor: document.getElementById('vendor').value || '',
+                        description: expenseNote || 'Expense',
+                        category: category,
+                        amount: remainingAmounts[i],
+                        receiptLink: document.getElementById('receiptLink').value || '',
+                        month: document.getElementById('expenseDate').value.substring(0, 7),
+                        type: 'expense'
+                    }));
+                }
+                
+                Promise.all(promises)
+                    .then(function() {
+                        showMessage('expenseMessage', '✅ Saved ' + promises.length + ' expense(s)!', 'success');
+                        document.getElementById('expenseEntryForm').reset();
+                        document.getElementById('expenseDate').valueAsDate = new Date();
+                    })
+                    .catch(function(error) {
+                        showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+                    })
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.textContent = '💾 Save Expense';
+                    });
             } else {
-                var cat = determineCategoryFromNote(note);
-                var desc = note;
-                if (amount === 6000 && !note) { cat = 'Payroll'; desc = 'Gym Attendant Meals'; }
-                saveToGoogleSheets({ date: document.getElementById('expenseDate').value, vendor: document.getElementById('vendor').value || '', description: desc, category: cat, amount: amount, receiptLink: document.getElementById('receiptLink').value || '', month: document.getElementById('expenseDate').value.substring(0,7), type: 'expense' }).then(function() { showMessage('expenseMessage', '✅ Saved!', 'success'); document.getElementById('expenseEntryForm').reset(); document.getElementById('expenseDate').valueAsDate = new Date(); }).catch(function(err) { showMessage('expenseMessage', '❌ Error', 'error'); }).finally(function() { btn.disabled = false; btn.textContent = '💾 Save Expense'; });
+                var category = determineCategoryFromNote(expenseNote);
+                var description = expenseNote;
+                
+                if (expenseAmount === 6000 && !expenseNote) {
+                    category = 'Payroll';
+                    description = 'Gym Attendant Meals';
+                }
+                
+                saveToGoogleSheets({
+                    date: document.getElementById('expenseDate').value,
+                    vendor: document.getElementById('vendor').value || '',
+                    description: description,
+                    category: category,
+                    amount: expenseAmount,
+                    receiptLink: document.getElementById('receiptLink').value || '',
+                    month: document.getElementById('expenseDate').value.substring(0, 7),
+                    type: 'expense'
+                })
+                    .then(function() {
+                        showMessage('expenseMessage', '✅ ' + description + ' - ' + category + ': ' + expenseAmount, 'success');
+                        document.getElementById('expenseEntryForm').reset();
+                        document.getElementById('expenseDate').valueAsDate = new Date();
+                    })
+                    .catch(function(error) {
+                        showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+                    })
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.textContent = '💾 Save Expense';
+                    });
             }
         });
         
+        // Expense batch functions
         function toggleExpenseBatch() {
-            var bf = document.getElementById('expenseBatchForm');
-            bf.classList.toggle('active');
-            if (bf.classList.contains('active') && document.getElementById('expenseBatchEntries').children.length === 0) addExpenseBatchEntry();
+            var batchForm = document.getElementById('expenseBatchForm');
+            if (batchForm.classList.contains('active')) {
+                batchForm.classList.remove('active');
+            } else {
+                batchForm.classList.add('active');
+                if (document.getElementById('expenseBatchEntries').children.length === 0) {
+                    addExpenseBatchEntry();
+                }
+            }
         }
         
         function addExpenseBatchEntry() {
-            var c = document.getElementById('expenseBatchEntries');
+            var container = document.getElementById('expenseBatchEntries');
             var id = expenseBatchCounter;
             var today = new Date().toISOString().slice(0,10);
-            var div = document.createElement('div');
-            div.className = 'batch-entry'; div.id = 'expense-batch-' + id;
-            div.innerHTML = '<h4>Expense #' + id + '</h4><div class="row"><div class="form-group"><label>Date</label><input type="date" class="batch-expense-date" value="' + today + '"></div><div class="form-group"><label>Vendor</label><input type="text" class="batch-expense-vendor" placeholder="Optional"></div></div><div class="form-group"><label>Note</label><input type="text" class="batch-expense-note" placeholder="Description"></div><div class="row"><div class="form-group"><label>Amount</label><input type="number" class="batch-expense-amount" step="0.01" placeholder="6000"></div><div class="form-group"><label>Split</label><input type="text" class="batch-expense-split" placeholder="6000+50000"></div></div><button class="remove-btn" onclick="removeExpenseBatchEntry(' + id + ')">Remove</button>';
-            c.appendChild(div);
+            var entryDiv = document.createElement('div');
+            entryDiv.className = 'batch-entry';
+            entryDiv.id = 'expense-batch-' + id;
+            entryDiv.innerHTML = '<h4>Expense #' + id + '</h4>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Date</label><input type="date" class="batch-expense-date" value="' + today + '"></div>' +
+                    '<div class="form-group"><label>Vendor</label><input type="text" class="batch-expense-vendor" placeholder="Optional"></div>' +
+                '</div>' +
+                '<div class="form-group"><label>Description / Note</label><input type="text" class="batch-expense-note" placeholder="e.g., water bill, salaries"></div>' +
+                '<div class="row">' +
+                    '<div class="form-group"><label>Amount</label><input type="number" class="batch-expense-amount" step="0.01" placeholder="6000"></div>' +
+                    '<div class="form-group"><label>Split Amounts</label><input type="text" class="batch-expense-split" placeholder="e.g., 6000+50000"></div>' +
+                '</div>' +
+                '<button class="remove-btn" onclick="removeExpenseBatchEntry(' + id + ')">Remove</button>';
+            container.appendChild(entryDiv);
             expenseBatchCounter++;
         }
         
-        function removeExpenseBatchEntry(id) { var e = document.getElementById('expense-batch-' + id); if (e) e.remove(); }
+        function removeExpenseBatchEntry(id) {
+            var element = document.getElementById('expense-batch-' + id);
+            if (element) element.remove();
+        }
         
         function submitExpenseBatch() {
-            var entries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
-            var allPromises = [], total = 0;
-            for (var i=0;i<entries.length;i++) {
-                var e = entries[i];
-                var date = e.querySelector('.batch-expense-date').value;
-                var vendor = e.querySelector('.batch-expense-vendor').value;
-                var note = e.querySelector('.batch-expense-note').value;
-                var amount = parseFloat(e.querySelector('.batch-expense-amount').value);
-                var split = e.querySelector('.batch-expense-split').value;
+            var batchEntries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
+            var allPromises = [];
+            var totalExpenses = 0;
+            
+            for (var i = 0; i < batchEntries.length; i++) {
+                var entry = batchEntries[i];
+                var date = entry.querySelector('.batch-expense-date').value;
+                var vendor = entry.querySelector('.batch-expense-vendor').value;
+                var note = entry.querySelector('.batch-expense-note').value;
+                var amount = parseFloat(entry.querySelector('.batch-expense-amount').value);
+                var splitStr = entry.querySelector('.batch-expense-split').value;
+                
                 if (!date || !note) continue;
-                var s = parseSplit(split);
-                var month = date.substring(0,7);
-                if (s && s.length > 0) {
-                    if (s[0] === 6000) { allPromises.push(saveToGoogleSheets({ date: date, vendor: vendor, description: 'Gym Attendant Meals', category: 'Payroll', amount: s[0], receiptLink: '', month: month, type: 'expense' })); total++; }
-                    for (var j=1;j<s.length;j++) { allPromises.push(saveToGoogleSheets({ date: date, vendor: vendor, description: note, category: determineCategoryFromNote(note), amount: s[j], receiptLink: '', month: month, type: 'expense' })); total++; }
+                
+                var splits = parseSplitAmounts(splitStr);
+                var month = date.substring(0, 7);
+                
+                if (splits && splits.length > 0) {
+                    var firstAmount = splits[0];
+                    var remainingAmounts = splits.slice(1);
+                    
+                    if (firstAmount === 6000) {
+                        allPromises.push(saveToGoogleSheets({
+                            date: date, vendor: vendor, description: 'Gym Attendant Meals',
+                            category: 'Payroll', amount: firstAmount, receiptLink: '',
+                            month: month, type: 'expense'
+                        }));
+                        totalExpenses++;
+                    }
+                    
+                    for (var s = 0; s < remainingAmounts.length; s++) {
+                        var category = determineCategoryFromNote(note);
+                        allPromises.push(saveToGoogleSheets({
+                            date: date, vendor: vendor, description: note || 'Expense',
+                            category: category, amount: remainingAmounts[s], receiptLink: '',
+                            month: month, type: 'expense'
+                        }));
+                        totalExpenses++;
+                    }
                 } else if (amount > 0) {
-                    var cat = determineCategoryFromNote(note);
-                    var desc = note;
-                    if (amount === 6000 && !note) { cat = 'Payroll'; desc = 'Gym Attendant Meals'; }
-                    allPromises.push(saveToGoogleSheets({ date: date, vendor: vendor, description: desc, category: cat, amount: amount, receiptLink: '', month: month, type: 'expense' }));
-                    total++;
+                    var category = determineCategoryFromNote(note);
+                    var description = note;
+                    
+                    if (amount === 6000 && !note) {
+                        category = 'Payroll';
+                        description = 'Gym Attendant Meals';
+                    }
+                    
+                    allPromises.push(saveToGoogleSheets({
+                        date: date, vendor: vendor, description: description,
+                        category: category, amount: amount, receiptLink: '',
+                        month: month, type: 'expense'
+                    }));
+                    totalExpenses++;
                 }
             }
-            if (allPromises.length === 0) { showMessage('expenseMessage', 'No valid expenses', 'error'); return; }
-            var btn = document.querySelector('#expenseBatchForm button:last-child');
-            btn.disabled = true; btn.textContent = 'Saving...';
-            Promise.all(allPromises).then(function() { showMessage('expenseMessage', '✅ Saved ' + total + ' expenses!', 'success'); document.getElementById('expenseBatchEntries').innerHTML = ''; expenseBatchCounter = 1; document.getElementById('expenseBatchForm').classList.remove('active'); }).catch(function(err) { showMessage('expenseMessage', '❌ Error', 'error'); }).finally(function() { btn.disabled = false; btn.textContent = '💾 Save All Expenses'; });
+            
+            if (allPromises.length === 0) {
+                showMessage('expenseMessage', 'No valid expenses to save', 'error');
+                return;
+            }
+            
+            var saveBtn = document.querySelector('#expenseBatchForm button:last-child');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            
+            Promise.all(allPromises)
+                .then(function() {
+                    showMessage('expenseMessage', '✅ Saved ' + totalExpenses + ' expense(s)!', 'success');
+                    document.getElementById('expenseBatchEntries').innerHTML = '';
+                    expenseBatchCounter = 1;
+                    document.getElementById('expenseBatchForm').classList.remove('active');
+                })
+                .catch(function(error) {
+                    showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+                })
+                .finally(function() {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = '💾 Save All Expenses';
+                });
         }
         
-        function showMessage(el, msg, type) {
-            var d = document.getElementById(el);
-            d.textContent = msg;
-            d.className = 'message ' + type;
-            setTimeout(function() { d.className = 'message'; }, 4000);
+        // ========== HELPER FUNCTIONS ==========
+        function showMessage(elementId, msg, type) {
+            var messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + type;
+            setTimeout(function() {
+                messageDiv.className = 'message';
+            }, 5000);
         }
         
+        // Set default dates
         document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('month').value = new Date().toISOString().slice(0,7);
+        document.getElementById('month').value = new Date().toISOString().slice(0, 7);
         document.getElementById('expenseDate').valueAsDate = new Date();
         
+        // Initialize
         initGymInfo();
         loadData();
         loadSavedImage();
