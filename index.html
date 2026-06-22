@@ -581,13 +581,12 @@
             background: #dee2e6;
         }
 
-        /* ─── PRINT STYLES ─── */
+        /* ─── PRINT STYLES (UPDATED) ─── */
         @media print {
             body * {
                 visibility: hidden;
             }
             .receipt-overlay,
-            .receipt-overlay.open,
             .receipt-overlay * {
                 visibility: visible;
             }
@@ -602,6 +601,9 @@
                 padding: 0 !important;
                 display: block !important;
                 animation: none !important;
+                margin: 0 !important;
+                page-break-after: avoid;
+                page-break-inside: avoid;
             }
             .receipt-modal {
                 max-width: 100% !important;
@@ -610,6 +612,8 @@
                 animation: none !important;
                 max-height: 100% !important;
                 overflow-y: visible !important;
+                page-break-inside: avoid;
+                margin: 0 auto;
             }
             .receipt-actions {
                 display: none !important;
@@ -619,6 +623,12 @@
             }
             .receipt-footer .powered {
                 display: none !important;
+            }
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: auto;
             }
         }
 
@@ -796,6 +806,8 @@
 
             <div class="stats">
                 <span class="status-badge"></span> <span id="paymentCount">0</span> payments recorded
+                &nbsp;|&nbsp;
+                <button onclick="exportData()" style="background:#007bff; padding:6px 12px; width:auto; font-size:13px; border-radius:6px;">📥 Export Data</button>
             </div>
         </div>
 
@@ -938,6 +950,24 @@
             return 'GYM-' + year + '-' + padded;
         }
 
+        // ─── EXPORT DATA ───
+        function exportData() {
+            var data = localStorage.getItem('gymPayments');
+            if (!data || data === '[]') {
+                alert('No payment data to export.');
+                return;
+            }
+            var blob = new Blob([data], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'gym_payments_backup.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         // ─── GYM INFO ───
         function initGymInfo() {
             document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
@@ -985,7 +1015,7 @@
                 zIndex: '2000',
                 pointerEvents: 'none',
                 whiteSpace: 'nowrap',
-                animation: 'fadeOut 2s ease forwards'
+                animation: 'toastFadeOut 2s ease forwards'
             });
             document.body.appendChild(toast);
             setTimeout(function() { if (toast && toast.parentNode) toast.remove(); }, 2000);
@@ -1203,7 +1233,7 @@
             }, 400);
         }
 
-        // ─── PAYMENT SUBMISSION ───
+        // ─── PAYMENT SUBMISSION (UPDATED) ───
         document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -1215,6 +1245,7 @@
             }
             var memberId = document.getElementById('memberId').value;
 
+            // Build payment object
             var payment = {
                 date: document.getElementById('date').value,
                 paymentType: document.getElementById('paymentType').value,
@@ -1228,17 +1259,17 @@
                 type: 'payment'
             };
 
+            // Generate transaction ID BEFORE sending to sheets
+            var counter = incrementTransactionCounter();
+            var transactionId = generateTransactionId(counter);
+            payment.transactionId = transactionId;
+
             var btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.textContent = 'Saving...';
 
             saveToGoogleSheets(payment)
                 .then(function(result) {
-                    // Generate transaction ID
-                    var counter = incrementTransactionCounter();
-                    var transactionId = generateTransactionId(counter);
-                    payment.transactionId = transactionId;
-
                     // Save locally
                     payments.push(payment);
                     saveData();
@@ -1273,7 +1304,7 @@
                 });
         });
 
-        // ─── BATCH PAYMENT ───
+        // ─── BATCH PAYMENT (UPDATED) ───
         function toggleBatch() {
             var batchForm = document.getElementById('batchForm');
             batchForm.classList.toggle('active');
@@ -1322,9 +1353,9 @@
         function submitBatch() {
             var entries = document.querySelectorAll('.batch-entry');
             var allPromises = [];
-            var savedCount = 0;
             var paymentsToSave = [];
 
+            // First gather all valid payments and generate IDs
             for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
                 var name = entry.querySelector('.batch-name').value;
@@ -1342,6 +1373,9 @@
                         classType: entry.querySelector('.batch-class').value || '',
                         type: 'payment'
                     };
+                    // Generate ID now
+                    var counter = incrementTransactionCounter();
+                    payment.transactionId = generateTransactionId(counter);
                     paymentsToSave.push(payment);
                 }
             }
@@ -1353,24 +1387,18 @@
 
             showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
 
+            // Save each to Google Sheets
             for (var j = 0; j < paymentsToSave.length; j++) {
-                var p = paymentsToSave[j];
                 allPromises.push(
-                    saveToGoogleSheets(p)
-                    .then(function(result) {
-                        // We need to capture the payment that was saved
-                        // We'll use a closure with index
-                    })
+                    saveToGoogleSheets(paymentsToSave[j])
                     .catch(function(err) { throw err; })
                 );
             }
 
             Promise.all(allPromises)
                 .then(function() {
-                    // Now assign transaction IDs and save locally
+                    // Save locally
                     for (var k = 0; k < paymentsToSave.length; k++) {
-                        var counter = incrementTransactionCounter();
-                        paymentsToSave[k].transactionId = generateTransactionId(counter);
                         payments.push(paymentsToSave[k]);
                     }
                     saveData();
@@ -1632,23 +1660,6 @@
                 0% { opacity: 1; transform: translateX(-50%) translateY(0); }
                 70% { opacity: 1; transform: translateX(-50%) translateY(0); }
                 100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
-            .receipt-overlay {
-                display: none !important;
-            }
-            .receipt-overlay.open {
-                display: flex !important;
-            }
-            @media print {
-                .receipt-overlay {
-                    display: block !important;
-                }
-                .receipt-overlay.open {
-                    display: block !important;
-                }
-                .receipt-actions {
-                    display: none !important;
-                }
             }
             `;
         document.head.appendChild(styleSheet);
