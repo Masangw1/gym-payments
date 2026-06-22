@@ -1,42 +1,43 @@
+I am running this app to record payments for a Gym setting. And I want a receipt to be created upon entering each transaction and printed and options for automatic printing:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gym Management Portal - The GYMnasium</title>
     <style>
-        /* ─── BASE RESET ─── */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        
+        /* DESKTOP LAYOUT - Wider container */
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
         }
-
-        /* ─── HEADER ─── */
+        
+        /* Header with Image - Now with double-tap hint */
         .header {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             border-radius: 20px;
             margin-bottom: 30px;
             overflow: hidden;
             cursor: pointer;
             position: relative;
         }
+        
+        /* Double-tap hint for mobile */
         .double-tap-hint {
             position: absolute;
             bottom: 10px;
             right: 15px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0,0,0,0.6);
             color: #ff6b6b;
             font-size: 10px;
             padding: 4px 8px;
@@ -46,11 +47,13 @@
             pointer-events: none;
             z-index: 10;
         }
+        
         @media (max-width: 768px) {
             .double-tap-hint {
                 opacity: 0.7;
             }
         }
+        
         .gym-banner {
             width: 100%;
             height: 250px;
@@ -66,7 +69,7 @@
             background: white;
             border-radius: 50%;
             padding: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             position: relative;
             z-index: 2;
         }
@@ -82,18 +85,18 @@
         }
         .gym-tagline {
             display: inline-block;
-            background: rgba(255, 107, 107, 0.2);
+            background: rgba(255,107,107,0.2);
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 14px;
             color: #ff6b6b;
         }
-
-        /* ─── FEATURE BAR ─── */
+        
+        /* DESKTOP FEATURE BAR */
         .features-desktop {
             display: flex;
             justify-content: space-around;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255,255,255,0.08);
             border-radius: 15px;
             padding: 20px;
             margin-top: 20px;
@@ -113,8 +116,8 @@
             font-size: 14px;
             font-weight: 500;
         }
-
-        /* ─── HIDDEN ADMIN ─── */
+        
+        /* Hidden Admin Panel */
         .hidden-admin {
             display: none;
             position: fixed;
@@ -125,13 +128,14 @@
             border-radius: 10px;
             padding: 15px;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             max-width: 280px;
         }
         .hidden-admin.active {
             display: block;
             animation: slideIn 0.3s ease;
         }
+        
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -142,6 +146,7 @@
                 transform: translateY(0);
             }
         }
+        
         .hidden-admin h4 {
             color: #ff6b6b;
             margin-bottom: 10px;
@@ -156,15 +161,14 @@
             width: 100%;
         }
         .hidden-admin .admin-btn-small {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             padding: 4px 8px;
             font-size: 11px;
             margin-right: 5px;
             width: auto;
             display: inline-block;
         }
-        .hidden-admin input,
-        .hidden-admin textarea {
+        .hidden-admin input, .hidden-admin textarea {
             padding: 6px;
             font-size: 12px;
             margin-bottom: 8px;
@@ -181,8 +185,8 @@
         .admin-close:hover {
             color: #ff6b6b;
         }
-
-        /* ─── TABS ─── */
+        
+        /* Tab Styles */
         .tabs {
             display: flex;
             gap: 10px;
@@ -191,7 +195,7 @@
         .tab {
             flex: 1;
             padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.1);
             border: none;
             border-radius: 10px;
             color: white;
@@ -203,56 +207,56 @@
         .tab.active {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
         }
-
-        /* ─── FORM CARDS ─── */
+        
+        /* DESKTOP TWO-COLUMN FORM LAYOUT */
         .form-card {
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             display: none;
         }
         .form-card.active {
             display: block;
         }
+        
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
-        .form-group {
+        
+        .form-group { 
             margin-bottom: 0;
         }
+        
         .form-group.full-width {
             grid-column: span 2;
         }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
+        
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #333; 
         }
-        input,
-        select,
-        textarea {
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 16px;
         }
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #ff6b6b;
+        input:focus, select:focus, textarea:focus { 
+            outline: none; 
+            border-color: #ff6b6b; 
         }
-        .row {
-            display: flex;
-            gap: 15px;
+        .row { 
+            display: flex; 
+            gap: 15px; 
         }
-        .row .form-group {
-            flex: 1;
+        .row .form-group { 
+            flex: 1; 
         }
         button {
             width: 100%;
@@ -266,12 +270,12 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        button:hover {
-            transform: translateY(-2px);
+        button:hover { 
+            transform: translateY(-2px); 
         }
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        button:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
         }
         .message {
             margin-top: 20px;
@@ -279,15 +283,15 @@
             border-radius: 10px;
             display: none;
         }
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            display: block;
+        .message.success { 
+            background: #d4edda; 
+            color: #155724; 
+            display: block; 
         }
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            display: block;
+        .message.error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            display: block; 
         }
         .batch-section {
             margin-top: 30px;
@@ -303,18 +307,21 @@
             color: #ff6b6b;
             font-weight: 600;
         }
-        .batch-form {
-            display: none;
-            margin-top: 20px;
+        .batch-form { 
+            display: none; 
+            margin-top: 20px; 
         }
-        .batch-form.active {
-            display: block;
+        .batch-form.active { 
+            display: block; 
         }
+        
+        /* DESKTOP BATCH ENTRIES GRID */
         .batch-entries-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 15px;
         }
+        
         .batch-entry {
             background: #f8f9fa;
             padding: 15px;
@@ -328,9 +335,9 @@
             margin-top: 10px;
             width: auto;
         }
-        .add-btn {
-            background: #28a745;
-            margin-bottom: 15px;
+        .add-btn { 
+            background: #28a745; 
+            margin-bottom: 15px; 
         }
         .stats {
             text-align: center;
@@ -355,284 +362,50 @@
             border-radius: 10px;
             overflow-x: auto;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
         }
-        th,
-        td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 13px;
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #eee; 
+            font-size: 13px; 
         }
-        th {
-            background: #ff6b6b;
-            color: white;
+        th { 
+            background: #ff6b6b; 
+            color: white; 
         }
         .category-hint {
             font-size: 12px;
             color: #666;
             margin-top: 5px;
         }
-
-        /* ─── AUTO-PRINT TOGGLE ─── */
-        .auto-print-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 16px;
-            padding: 12px 18px;
-            background: #f1f3f5;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #333;
-            flex-wrap: wrap;
-        }
-        .auto-print-toggle input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #ff6b6b;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .auto-print-toggle label {
-            margin: 0;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .auto-print-toggle .hint {
-            color: #888;
-            font-size: 12px;
-            margin-left: auto;
-        }
-
-        /* ─── RECEIPT OVERLAY ─── */
-        .receipt-overlay {
+        
+        /* Toast notification for double-tap */
+        .toast-notification {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-        .receipt-overlay.open {
-            display: flex;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .receipt-modal {
-            background: white;
-            border-radius: 16px;
-            max-width: 460px;
-            width: 100%;
-            max-height: 95vh;
-            overflow-y: auto;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-            padding: 0;
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .receipt-header {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 22px 28px 16px 28px;
-            border-radius: 16px 16px 0 0;
-            text-align: center;
-            color: white;
-        }
-        .receipt-header .receipt-gym-name {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .receipt-header .receipt-gym-tagline {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 4px;
-        }
-        .receipt-header .receipt-number {
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 30px;
             font-size: 14px;
-            opacity: 0.7;
-            margin-top: 8px;
-            font-family: monospace;
-            letter-spacing: 0.5px;
-            background: rgba(255, 255, 255, 0.08);
-            display: inline-block;
-            padding: 2px 14px;
-            border-radius: 20px;
+            z-index: 2000;
+            animation: fadeOut 2s ease forwards;
+            pointer-events: none;
+            white-space: nowrap;
         }
-        .receipt-header .receipt-date {
-            font-size: 12px;
-            opacity: 0.5;
-            margin-top: 6px;
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            70% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
-
-        .receipt-body {
-            padding: 22px 28px 18px 28px;
-        }
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #f0f0f0;
-            font-size: 15px;
-        }
-        .receipt-row:last-of-type {
-            border-bottom: none;
-        }
-        .receipt-row .label {
-            color: #666;
-            font-weight: 500;
-        }
-        .receipt-row .value {
-            font-weight: 600;
-            color: #222;
-            text-align: right;
-            word-break: break-word;
-            max-width: 60%;
-        }
-        .receipt-row .value.amount {
-            font-size: 22px;
-            color: #ff6b6b;
-            font-weight: 700;
-        }
-        .receipt-row .value.member {
-            font-weight: 700;
-            color: #1a1a2e;
-        }
-
-        .receipt-divider {
-            border: none;
-            border-top: 2px dashed #ddd;
-            margin: 14px 0 18px 0;
-        }
-
-        .receipt-footer {
-            text-align: center;
-            padding: 14px 28px 20px 28px;
-            font-size: 13px;
-            color: #888;
-            border-top: 1px solid #f0f0f0;
-        }
-        .receipt-footer .thank-you {
-            font-size: 16px;
-            font-weight: 600;
-            color: #ff6b6b;
-            margin-bottom: 4px;
-        }
-        .receipt-footer .powered {
-            font-size: 11px;
-            color: #bbb;
-        }
-
-        .receipt-actions {
-            display: flex;
-            gap: 12px;
-            padding: 0 28px 24px 28px;
-        }
-        .receipt-actions button {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .receipt-actions .btn-print {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-        }
-        .receipt-actions .btn-print:hover {
-            transform: scale(1.02);
-        }
-        .receipt-actions .btn-close {
-            background: #e9ecef;
-            color: #333;
-        }
-        .receipt-actions .btn-close:hover {
-            background: #dee2e6;
-        }
-
-        /* ─── PRINT STYLES (UPDATED) ─── */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .receipt-overlay,
-            .receipt-overlay * {
-                visibility: visible;
-            }
-            .receipt-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: white !important;
-                backdrop-filter: none !important;
-                padding: 0 !important;
-                display: block !important;
-                animation: none !important;
-                margin: 0 !important;
-                page-break-after: avoid;
-                page-break-inside: avoid;
-            }
-            .receipt-modal {
-                max-width: 100% !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                animation: none !important;
-                max-height: 100% !important;
-                overflow-y: visible !important;
-                page-break-inside: avoid;
-                margin: 0 auto;
-            }
-            .receipt-actions {
-                display: none !important;
-            }
-            .receipt-header {
-                border-radius: 0 !important;
-            }
-            .receipt-footer .powered {
-                display: none !important;
-            }
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                height: auto;
-            }
-        }
-
-        /* ─── RESPONSIVE ─── */
+        
+        /* Responsive */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -662,23 +435,12 @@
                 height: 150px;
                 margin: -70px auto 10px auto;
             }
-            .auto-print-toggle .hint {
-                margin-left: 0;
-                width: 100%;
-            }
-            .receipt-modal {
-                max-width: 100%;
-                border-radius: 12px;
-            }
-            .receipt-actions {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- ═══════ HEADER ═══════ -->
+        <!-- Header with Gym Logo - Double tap to open admin -->
         <div class="header" id="adminTriggerHeader">
             <div class="double-tap-hint">⚡ Double-tap for Admin</div>
             <img id="gymBanner" class="gym-banner" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=250&fit=crop" alt="Gym Interior">
@@ -689,16 +451,31 @@
             </div>
         </div>
 
-        <!-- ═══════ FEATURE BAR ═══════ -->
+        <!-- DESKTOP FEATURE BAR -->
         <div class="features-desktop">
-            <div class="feature-item"><span class="feature-icon">🕐</span><span class="feature-text">Open Daily</span></div>
-            <div class="feature-item"><span class="feature-icon">💧</span><span class="feature-text">Water</span></div>
-            <div class="feature-item"><span class="feature-icon">🧘</span><span class="feature-text">Aerobics Classes</span></div>
-            <div class="feature-item"><span class="feature-icon">💪</span><span class="feature-text">Trainers</span></div>
-            <div class="feature-item"><span class="feature-icon">🏆</span><span class="feature-text">Supportive Community</span></div>
+            <div class="feature-item">
+                <span class="feature-icon">🕐</span>
+                <span class="feature-text">Open Daily</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">💧</span>
+                <span class="feature-text">Water</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🧘</span>
+                <span class="feature-text">Aerobics Classes</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">💪</span>
+                <span class="feature-text">Trainers</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🏆</span>
+                <span class="feature-text">Supportive Community</span>
+            </div>
         </div>
 
-        <!-- ═══════ HIDDEN ADMIN ═══════ -->
+        <!-- Hidden Admin Panel -->
         <div id="hiddenAdmin" class="hidden-admin">
             <span class="admin-close" onclick="toggleHiddenAdmin()">✕</span>
             <h4>🔧 Admin Settings</h4>
@@ -722,16 +499,16 @@
             <button class="admin-btn" style="margin-top:5px; background:#333;" onclick="toggleHiddenAdmin()">Close</button>
         </div>
 
-        <!-- ═══════ TABS ═══════ -->
+        <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('payment')">💰 Payments</button>
             <button class="tab" onclick="switchTab('expense')">📝 Expenses</button>
         </div>
 
-        <!-- ═══════ PAYMENT FORM ═══════ -->
+        <!-- ========== PAYMENT FORM ========== -->
         <div id="paymentForm" class="form-card active">
             <div id="message" class="message"></div>
-
+            
             <form id="paymentEntryForm">
                 <div class="form-grid">
                     <div class="form-group">
@@ -785,13 +562,6 @@
                     </div>
                 </div>
 
-                <!-- AUTO-PRINT TOGGLE -->
-                <div class="auto-print-toggle">
-                    <input type="checkbox" id="autoPrintToggle" checked>
-                    <label for="autoPrintToggle">🖨️ Auto-print receipt</label>
-                    <span class="hint">Receipt will print automatically after each payment</span>
-                </div>
-
                 <button type="submit" id="submitBtn">💾 Save Payment</button>
             </form>
 
@@ -806,15 +576,13 @@
 
             <div class="stats">
                 <span class="status-badge"></span> <span id="paymentCount">0</span> payments recorded
-                &nbsp;|&nbsp;
-                <button onclick="exportData()" style="background:#007bff; padding:6px 12px; width:auto; font-size:13px; border-radius:6px;">📥 Export Data</button>
             </div>
         </div>
 
-        <!-- ═══════ EXPENSE FORM ═══════ -->
+        <!-- ========== EXPENSE FORM ========== -->
         <div id="expenseForm" class="form-card">
             <div id="expenseMessage" class="message"></div>
-
+            
             <form id="expenseEntryForm">
                 <div class="form-grid">
                     <div class="form-group">
@@ -829,7 +597,9 @@
                     <div class="form-group full-width">
                         <label>Description / Note *</label>
                         <input type="text" id="expenseNote" placeholder="e.g., water bill, mop, salaries, rent (May)" required>
-                        <div class="category-hint">💡 Keywords: water, electricity, mop, rent, salary, marketing, maintenance, equipment</div>
+                        <div class="category-hint">
+                            💡 Keywords: water, electricity, mop, rent, salary, marketing, maintenance, equipment
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -844,7 +614,9 @@
                     <div class="form-group full-width">
                         <label>Split Amount (if multiple expenses)</label>
                         <input type="text" id="splitAmounts" placeholder="e.g., 6000+50000 (first is meals, rest are other)">
-                        <div class="category-hint">💡 For split expenses: first amount (6000) = Gym Attendant Meals, remaining = described in Note</div>
+                        <div class="category-hint">
+                            💡 For split expenses: first amount (6000) = Gym Attendant Meals, remaining = described in Note
+                        </div>
                     </div>
                 </div>
 
@@ -865,60 +637,28 @@
             </div>
         </div>
 
-        <!-- ═══════ PAYMENT HISTORY ═══════ -->
+        <!-- Payment History Table -->
         <div class="data-table">
             <table id="paymentTable">
                 <thead>
-                    <tr><th>Receipt #</th><th>Date</th><th>Type</th><th>Name</th><th>Amount</th><th>Method</th><th>Month</th></tr>
+                    <tr><th>Date</th><th>Type</th><th>Name</th><th>Amount</th><th>Method</th><th>Month</th></tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="7" style="text-align:center;">No payments recorded</td></tr>
+                    <tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ═══════ RECEIPT OVERLAY ═══════ -->
-    <div id="receiptOverlay" class="receipt-overlay">
-        <div class="receipt-modal" id="receiptModal">
-            <div class="receipt-header">
-                <div class="receipt-gym-name" id="receiptGymName">💪 The GYMnasium</div>
-                <div class="receipt-gym-tagline" id="receiptGymTagline">🏋️ Open Daily · 🧘 Aerobics Classes</div>
-                <div class="receipt-number" id="receiptNumber"># GYM-2026-001</div>
-                <div class="receipt-date" id="receiptDate">📅 2026-06-21</div>
-            </div>
-            <div class="receipt-body">
-                <div class="receipt-row"><span class="label">Member / Guest</span><span class="value member" id="receiptMember">John Doe</span></div>
-                <div class="receipt-row"><span class="label">Payment Type</span><span class="value" id="receiptType">Monthly Subscription</span></div>
-                <div class="receipt-row"><span class="label">Payment Method</span><span class="value" id="receiptMethod">Cash</span></div>
-                <div class="receipt-row"><span class="label">Month</span><span class="value" id="receiptMonth">2026-06</span></div>
-                <div class="receipt-row" id="receiptClassRow" style="display:none;"><span class="label">Class</span><span class="value" id="receiptClass">—</span></div>
-                <div class="receipt-row" id="receiptNotesRow" style="display:none;"><span class="label">Notes</span><span class="value" id="receiptNotes" style="font-weight:400;color:#555;">—</span></div>
-                <hr class="receipt-divider">
-                <div class="receipt-row"><span class="label" style="font-size:17px;font-weight:700;">TOTAL</span><span class="value amount" id="receiptAmount">K 50.00</span></div>
-            </div>
-            <div class="receipt-footer">
-                <div class="thank-you">🙏 Thank You!</div>
-                <div class="powered">Powered by GYMnasium · Receipt generated automatically</div>
-            </div>
-            <div class="receipt-actions">
-                <button class="btn-print" onclick="printReceipt()">🖨️ Print Receipt</button>
-                <button class="btn-close" onclick="closeReceipt()">✕ Close</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // ═══════════════════════════════════════════════════
-        //  CONFIGURATION
-        // ═══════════════════════════════════════════════════
-
-        var WORKER_URL = 'https://workers-playground-tight-shadow-59e4.mmasangwi.workers.dev';
-
-        var GYM_NAME = '💪 The GYMnasium';
+        // CLOUDFLARE WORKER URL - UPDATE THIS
+        var WORKER_URL = 'https://workers-playground-tight-term-fdc2.mmasangwi.workers.dev';
+        
+        // ========== GYM INFORMATION ==========
         var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
-        var GYM_TAGLINE = "🏋️ Open 24/6 Closed Sundays | 💧 Water | 🧘 Aerobics Classes";
-
+        var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
+        
+        // Banner images array
         var BANNER_IMAGES = [
             'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=250&fit=crop',
             'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&h=250&fit=crop',
@@ -927,104 +667,37 @@
             'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1200&h=250&fit=crop'
         ];
         var currentBannerIndex = 0;
-
+        
         var payments = [];
         var batchCounter = 1;
         var expenseBatchCounter = 1;
 
-        // ─── TRANSACTION ID COUNTER ───
-        function getTransactionCounter() {
-            var val = localStorage.getItem('gymTransactionCounter');
-            return val ? parseInt(val, 10) : 0;
-        }
-
-        function incrementTransactionCounter() {
-            var next = getTransactionCounter() + 1;
-            localStorage.setItem('gymTransactionCounter', String(next));
-            return next;
-        }
-
-        function generateTransactionId(counter) {
-            var year = new Date().getFullYear();
-            var padded = String(counter).padStart(3, '0');
-            return 'GYM-' + year + '-' + padded;
-        }
-
-        // ─── EXPORT DATA ───
-        function exportData() {
-            var data = localStorage.getItem('gymPayments');
-            if (!data || data === '[]') {
-                alert('No payment data to export.');
-                return;
-            }
-            var blob = new Blob([data], { type: 'application/json' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'gym_payments_backup.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // ─── GYM INFO ───
-        function initGymInfo() {
-            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
-            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
-            document.getElementById('receiptGymName').innerText = GYM_NAME;
-            document.getElementById('receiptGymTagline').innerText = GYM_TAGLINE;
-        }
-
-        function saveGymInfo() {
-            var newDescription = document.getElementById('adminDescription').value;
-            var newTagline = document.getElementById('adminTagline').value;
-            if (newDescription) {
-                document.getElementById('gymDescription').innerText = newDescription;
-                GYM_DESCRIPTION = newDescription;
-            }
-            if (newTagline) {
-                document.getElementById('gymTagline').innerText = newTagline;
-                GYM_TAGLINE = newTagline;
-                document.getElementById('receiptGymTagline').innerText = newTagline;
-            }
-            showMessage('message', '✅ Gym information saved!', 'success');
-            showToast('✅ Gym info saved');
-        }
-
-        // ─── DOUBLE-TAP ADMIN ───
+        // ========== METHOD 4: DOUBLE-TAP ON HEADER ==========
         var tapCount = 0;
         var tapTimer;
-
+        
         function showToast(message) {
-            var existing = document.querySelector('.toast-notification');
-            if (existing) existing.remove();
+            // Remove existing toast
+            var existingToast = document.querySelector('.toast-notification');
+            if (existingToast) existingToast.remove();
+            
+            // Create new toast
             var toast = document.createElement('div');
             toast.className = 'toast-notification';
             toast.textContent = message;
-            Object.assign(toast.style, {
-                position: 'fixed',
-                bottom: '80px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(0,0,0,0.8)',
-                color: '#ff6b6b',
-                padding: '10px 20px',
-                borderRadius: '30px',
-                fontSize: '14px',
-                zIndex: '2000',
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-                animation: 'toastFadeOut 2s ease forwards'
-            });
             document.body.appendChild(toast);
-            setTimeout(function() { if (toast && toast.parentNode) toast.remove(); }, 2000);
+            
+            // Remove after animation
+            setTimeout(function() {
+                if (toast && toast.parentNode) toast.remove();
+            }, 2000);
         }
-
+        
         function toggleHiddenAdmin() {
             var panel = document.getElementById('hiddenAdmin');
             panel.classList.toggle('active');
             if (panel.classList.contains('active')) {
+                // Load current values into admin form
                 document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
                 document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
                 showToast('🔧 Admin Panel Opened');
@@ -1032,26 +705,56 @@
                 showToast('🔧 Admin Panel Closed');
             }
         }
-
+        
+        // Double-tap detection on header
         document.getElementById('adminTriggerHeader').addEventListener('click', function() {
             tapCount++;
+            
             if (tapCount === 1) {
-                tapTimer = setTimeout(function() { tapCount = 0; }, 300);
+                // First tap - set timer
+                tapTimer = setTimeout(function() {
+                    tapCount = 0;
+                }, 300);
             } else if (tapCount === 2) {
+                // Double tap detected!
                 clearTimeout(tapTimer);
                 tapCount = 0;
                 toggleHiddenAdmin();
             }
         });
-
+        
+        // Also support keyboard shortcut (Ctrl+Shift+A) for desktop
         document.addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
                 e.preventDefault();
                 toggleHiddenAdmin();
             }
         });
+        
+        // ========== GYM INFO FUNCTIONS ==========
+        function saveGymInfo() {
+            var newDescription = document.getElementById('adminDescription').value;
+            var newTagline = document.getElementById('adminTagline').value;
+            
+            if (newDescription) {
+                document.getElementById('gymDescription').innerText = newDescription;
+                GYM_DESCRIPTION = newDescription;
+            }
+            if (newTagline) {
+                document.getElementById('gymTagline').innerText = newTagline;
+                GYM_TAGLINE = newTagline;
+            }
+            
+            showMessage('message', '✅ Gym information saved!', 'success');
+            showToast('✅ Gym info saved');
+        }
+        
+        function initGymInfo() {
+            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
+            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
+        }
 
-        // ─── BANNER & LOGO ───
+        // ========== GYM LOGO AND IMAGE MANAGEMENT ==========
         function changeBannerImage() {
             currentBannerIndex = (currentBannerIndex + 1) % BANNER_IMAGES.length;
             document.getElementById('gymBanner').src = BANNER_IMAGES[currentBannerIndex];
@@ -1059,34 +762,39 @@
             showMessage('message', '✅ Banner image changed!', 'success');
             showToast('🖼️ Banner changed');
         }
-
+        
         function loadSavedImage() {
-            var saved = localStorage.getItem('gymBannerImage');
-            if (saved) {
-                document.getElementById('gymBanner').src = saved;
+            var savedImage = localStorage.getItem('gymBannerImage');
+            if (savedImage) {
+                document.getElementById('gymBanner').src = savedImage;
                 for (var i = 0; i < BANNER_IMAGES.length; i++) {
-                    if (BANNER_IMAGES[i] === saved) { currentBannerIndex = i; break; }
+                    if (BANNER_IMAGES[i] === savedImage) {
+                        currentBannerIndex = i;
+                        break;
+                    }
                 }
             }
-            var logo = localStorage.getItem('gymLogo');
-            if (logo) document.getElementById('gymLogo').src = logo;
+            var savedLogo = localStorage.getItem('gymLogo');
+            if (savedLogo) {
+                document.getElementById('gymLogo').src = savedLogo;
+            }
         }
-
+        
         document.getElementById('adminLogoUpload').addEventListener('change', function(event) {
             var file = event.target.files[0];
             if (file) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    var url = e.target.result;
-                    document.getElementById('gymLogo').src = url;
-                    localStorage.setItem('gymLogo', url);
+                    var logoUrl = e.target.result;
+                    document.getElementById('gymLogo').src = logoUrl;
+                    localStorage.setItem('gymLogo', logoUrl);
                     showMessage('message', '✅ Gym logo uploaded!', 'success');
                     showToast('✅ Logo uploaded');
                 };
                 reader.readAsDataURL(file);
             }
         });
-
+        
         function resetLogo() {
             var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
             document.getElementById('gymLogo').src = defaultLogo;
@@ -1095,20 +803,24 @@
             showToast('✅ Logo reset');
         }
 
-        // ─── TABS ───
+        // ========== TAB SWITCHING ==========
         function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-            document.querySelectorAll('.form-card').forEach(function(f) { f.classList.remove('active'); });
+            var tabs = document.querySelectorAll('.tab');
+            var forms = document.querySelectorAll('.form-card');
+            
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            forms.forEach(function(f) { f.classList.remove('active'); });
+            
             if (tab === 'payment') {
-                document.querySelectorAll('.tab')[0].classList.add('active');
+                tabs[0].classList.add('active');
                 document.getElementById('paymentForm').classList.add('active');
             } else {
-                document.querySelectorAll('.tab')[1].classList.add('active');
+                tabs[1].classList.add('active');
                 document.getElementById('expenseForm').classList.add('active');
             }
         }
 
-        // ─── PAYMENT DATA ───
+        // ========== PAYMENT FUNCTIONS ==========
         function loadData() {
             var saved = localStorage.getItem('gymPayments');
             if (saved) {
@@ -1130,14 +842,13 @@
         function renderTable() {
             var tbody = document.getElementById('tableBody');
             if (payments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No payments recorded</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No payments recorded</td></tr>';
                 return;
             }
             var html = '';
             for (var i = payments.length - 1; i >= 0; i--) {
                 var p = payments[i];
                 html += '<tr>';
-                html += '<td><strong>' + (p.transactionId || '—') + '</strong></td>';
                 html += '<td>' + p.date + '</td>';
                 html += '<td>' + p.paymentType + '</td>';
                 html += '<td>' + p.memberName + '</td>';
@@ -1149,7 +860,6 @@
             tbody.innerHTML = html;
         }
 
-        // ─── GOOGLE SHEETS SAVE ───
         function saveToGoogleSheets(data) {
             return fetch(WORKER_URL, {
                 method: 'POST',
@@ -1165,78 +875,10 @@
             });
         }
 
-        // ─── MESSAGE HELPER ───
-        function showMessage(elementId, msg, type) {
-            var div = document.getElementById(elementId);
-            div.textContent = msg;
-            div.className = 'message ' + type;
-            setTimeout(function() { div.className = 'message'; }, 6000);
-        }
-
-        // ─── RECEIPT FUNCTIONS ───
-        var lastReceiptData = null;
-
-        function showReceipt(payment, transactionId) {
-            // Fill receipt
-            document.getElementById('receiptNumber').textContent = '# ' + transactionId;
-            document.getElementById('receiptDate').textContent = '📅 ' + payment.date;
-            document.getElementById('receiptMember').textContent = payment.memberName;
-            document.getElementById('receiptType').textContent = payment.paymentType;
-            document.getElementById('receiptMethod').textContent = payment.paymentMethod;
-            document.getElementById('receiptMonth').textContent = payment.month;
-            document.getElementById('receiptAmount').textContent = 'K ' + parseFloat(payment.amount).toFixed(2);
-
-            // Class (optional)
-            var classRow = document.getElementById('receiptClassRow');
-            var classVal = document.getElementById('receiptClass');
-            if (payment.classType) {
-                classRow.style.display = 'flex';
-                classVal.textContent = payment.classType;
-            } else {
-                classRow.style.display = 'none';
-            }
-
-            // Notes (optional)
-            var notesRow = document.getElementById('receiptNotesRow');
-            var notesVal = document.getElementById('receiptNotes');
-            if (payment.notes && payment.notes.trim()) {
-                notesRow.style.display = 'flex';
-                notesVal.textContent = payment.notes.trim();
-            } else {
-                notesRow.style.display = 'none';
-            }
-
-            // Gym name & tagline (from current settings)
-            document.getElementById('receiptGymName').textContent = GYM_NAME;
-            document.getElementById('receiptGymTagline').textContent = GYM_TAGLINE;
-
-            // Store for print
-            lastReceiptData = { payment: payment, transactionId: transactionId };
-
-            // Show overlay
-            var overlay = document.getElementById('receiptOverlay');
-            overlay.classList.add('open');
-        }
-
-        function closeReceipt() {
-            document.getElementById('receiptOverlay').classList.remove('open');
-        }
-
-        function printReceipt() {
-            window.print();
-        }
-
-        // Auto-print after a short delay (so DOM renders)
-        function autoPrintReceipt() {
-            setTimeout(function() {
-                window.print();
-            }, 400);
-        }
-
-        // ─── PAYMENT SUBMISSION (UPDATED) ───
+        // Payment submission
         document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
+            
             var memberName = document.getElementById('memberName').value;
             var classType = document.getElementById('classType').value;
             var displayName = memberName;
@@ -1244,8 +886,7 @@
                 displayName = memberName + ' (' + classType + ')';
             }
             var memberId = document.getElementById('memberId').value;
-
-            // Build payment object
+            
             var payment = {
                 date: document.getElementById('date').value,
                 paymentType: document.getElementById('paymentType').value,
@@ -1255,39 +896,21 @@
                 paymentMethod: document.getElementById('paymentMethod').value,
                 month: document.getElementById('month').value,
                 notes: document.getElementById('notes').value || '',
-                classType: classType || '',
                 type: 'payment'
             };
-
-            // Generate transaction ID BEFORE sending to sheets
-            var counter = incrementTransactionCounter();
-            var transactionId = generateTransactionId(counter);
-            payment.transactionId = transactionId;
-
+            
             var btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.textContent = 'Saving...';
-
+            
             saveToGoogleSheets(payment)
                 .then(function(result) {
-                    // Save locally
                     payments.push(payment);
                     saveData();
                     renderTable();
-
                     var memberMsg = result.memberId ? ' (Member: ' + result.memberId + ')' : '';
-                    showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount + memberMsg + ' · ' + transactionId, 'success');
-
-                    // ─── SHOW RECEIPT ───
-                    showReceipt(payment, transactionId);
-
-                    // ─── AUTO-PRINT ───
-                    var autoPrint = document.getElementById('autoPrintToggle').checked;
-                    if (autoPrint) {
-                        autoPrintReceipt();
-                    }
-
-                    // Reset form
+                    showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount + memberMsg, 'success');
+                    
                     document.getElementById('paymentEntryForm').reset();
                     document.getElementById('date').valueAsDate = new Date();
                     document.getElementById('month').value = new Date().toISOString().slice(0, 7);
@@ -1304,62 +927,68 @@
                 });
         });
 
-        // ─── BATCH PAYMENT (UPDATED) ───
+        // Payment batch functions
         function toggleBatch() {
             var batchForm = document.getElementById('batchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) {
-                addBatchEntry();
+            if (batchForm.classList.contains('active')) {
+                batchForm.classList.remove('active');
+            } else {
+                batchForm.classList.add('active');
+                if (document.getElementById('batchEntries').children.length === 0) {
+                    addBatchEntry();
+                }
             }
         }
 
         function addBatchEntry() {
             var container = document.getElementById('batchEntries');
             var id = batchCounter;
-            var today = new Date().toISOString().slice(0, 10);
-            var currentMonth = new Date().toISOString().slice(0, 7);
+            var today = new Date().toISOString().slice(0,10);
+            var currentMonth = new Date().toISOString().slice(0,7);
             var entryDiv = document.createElement('div');
             entryDiv.className = 'batch-entry';
             entryDiv.id = 'batch-' + id;
             entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Payment #' + id + '</h4>' +
                 '<div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div>' +
                 '<div class="form-group"><label>Type</label>' +
-                '<select class="batch-type">' +
-                '<option value="Monthly Subscription">Monthly Subscription</option>' +
-                '<option value="Drop-in">Drop-in</option>' +
-                '<option value="Class Fee">Class Fee</option>' +
-                '<option value="Late Fee">Late Fee</option>' +
-                '</select></div>' +
+                    '<select class="batch-type">' +
+                        '<option value="Monthly Subscription">Monthly Subscription</option>' +
+                        '<option value="Drop-in">Drop-in</option>' +
+                        '<option value="Class Fee">Class Fee</option>' +
+                        '<option value="Late Fee">Late Fee</option>' +
+                    '</select>' +
+                '</div>' +
                 '<div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>' +
                 '<div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>' +
                 '<div class="form-group"><label>Method</label>' +
-                '<select class="batch-method">' +
-                '<option value="Cash">Cash</option>' +
-                '<option value="Airtel Money">Airtel Money</option>' +
-                '<option value="Bank Transfer">Bank Transfer</option>' +
-                '</select></div>' +
+                    '<select class="batch-method">' +
+                        '<option value="Cash">Cash</option>' +
+                        '<option value="Airtel Money">Airtel Money</option>' +
+                        '<option value="Bank Transfer">Bank Transfer</option>' +
+                    '</select>' +
+                '</div>' +
                 '<div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + currentMonth + '"></div>' +
-                '<div class="form-group"><label>Class</label><input type="text" class="batch-class" placeholder="Optional"></div>' +
                 '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
             container.appendChild(entryDiv);
             batchCounter++;
         }
 
         function removeBatchEntry(id) {
-            var el = document.getElementById('batch-' + id);
-            if (el) el.remove();
+            var element = document.getElementById('batch-' + id);
+            if (element) element.remove();
         }
 
-        function submitBatch() {
-            var entries = document.querySelectorAll('.batch-entry');
-            var allPromises = [];
+        async function submitBatch() {
+            var batchEntries = document.querySelectorAll('.batch-entry');
+            var saved = 0;
+            var failed = 0;
             var paymentsToSave = [];
-
-            // First gather all valid payments and generate IDs
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
+            
+            for (var i = 0; i < batchEntries.length; i++) {
+                var entry = batchEntries[i];
                 var name = entry.querySelector('.batch-name').value;
                 var amount = entry.querySelector('.batch-amount').value;
+                
                 if (name && amount) {
                     var payment = {
                         date: entry.querySelector('.batch-date').value,
@@ -1370,72 +999,64 @@
                         paymentMethod: entry.querySelector('.batch-method').value,
                         month: entry.querySelector('.batch-month').value,
                         notes: 'Batch entry',
-                        classType: entry.querySelector('.batch-class').value || '',
                         type: 'payment'
                     };
-                    // Generate ID now
-                    var counter = incrementTransactionCounter();
-                    payment.transactionId = generateTransactionId(counter);
                     paymentsToSave.push(payment);
                 }
             }
-
+            
             if (paymentsToSave.length === 0) {
                 showMessage('message', 'No valid entries to save', 'error');
                 return;
             }
-
+            
             showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
-
-            // Save each to Google Sheets
-            for (var j = 0; j < paymentsToSave.length; j++) {
-                allPromises.push(
-                    saveToGoogleSheets(paymentsToSave[j])
-                    .catch(function(err) { throw err; })
-                );
+            
+            for (var i = 0; i < paymentsToSave.length; i++) {
+                var payment = paymentsToSave[i];
+                try {
+                    await saveToGoogleSheets(payment);
+                    saved++;
+                    payments.push(payment);
+                } catch(error) {
+                    failed++;
+                }
             }
-
-            Promise.all(allPromises)
-                .then(function() {
-                    // Save locally
-                    for (var k = 0; k < paymentsToSave.length; k++) {
-                        payments.push(paymentsToSave[k]);
-                    }
-                    saveData();
-                    renderTable();
-
-                    // Show receipt for the last payment
-                    var last = paymentsToSave[paymentsToSave.length - 1];
-                    showReceipt(last, last.transactionId);
-                    if (document.getElementById('autoPrintToggle').checked) {
-                        autoPrintReceipt();
-                    }
-
-                    showMessage('message', '✅ Saved ' + paymentsToSave.length + ' payment(s)!', 'success');
-                    document.getElementById('batchEntries').innerHTML = '';
-                    batchCounter = 1;
-                    document.getElementById('batchForm').classList.remove('active');
-                })
-                .catch(function(error) {
-                    showMessage('message', '❌ Error: ' + error.message, 'error');
-                });
+            
+            if (saved > 0) {
+                saveData();
+                renderTable();
+                var msg = '✅ Saved ' + saved + ' payment(s)!';
+                if (failed > 0) msg = msg + ' (' + failed + ' failed)';
+                showMessage('message', msg, 'success');
+            } else {
+                showMessage('message', 'No payments were saved', 'error');
+            }
+            
+            document.getElementById('batchEntries').innerHTML = '';
+            batchCounter = 1;
+            document.getElementById('batchForm').classList.remove('active');
         }
 
-        // ─── EXPENSE FUNCTIONS ───
+        // ========== EXPENSE FUNCTIONS ==========
+        
         function determineCategoryFromNote(note) {
             if (!note) return 'Other';
-            var lower = note.toLowerCase();
-            if (lower.indexOf('mop') > -1) return 'Cleaning';
-            if (lower.indexOf('water') > -1 || lower.indexOf('electric') > -1) return 'Utilities';
-            if (lower.indexOf('rent') > -1) return 'Rent';
-            if (lower.indexOf('salary') > -1 || lower.indexOf('payroll') > -1) return 'Payroll';
-            if (lower.indexOf('marketing') > -1 || lower.indexOf('advert') > -1) return 'Marketing';
-            if (lower.indexOf('cleaning') > -1) return 'Cleaning';
-            if (lower.indexOf('maintenance') > -1 || lower.indexOf('repair') > -1) return 'Maintenance';
-            if (lower.indexOf('equipment') > -1) return 'Equipment';
+            var lowerNote = note.toLowerCase();
+            
+            if (lowerNote.indexOf('mop') > -1) return 'Cleaning';
+            if (lowerNote.indexOf('water') > -1) return 'Utilities';
+            if (lowerNote.indexOf('electric') > -1 || lowerNote.indexOf('electricity') > -1) return 'Utilities';
+            if (lowerNote.indexOf('rent') > -1) return 'Rent';
+            if (lowerNote.indexOf('salary') > -1 || lowerNote.indexOf('payroll') > -1) return 'Payroll';
+            if (lowerNote.indexOf('marketing') > -1 || lowerNote.indexOf('advert') > -1) return 'Marketing';
+            if (lowerNote.indexOf('cleaning') > -1) return 'Cleaning';
+            if (lowerNote.indexOf('maintenance') > -1 || lowerNote.indexOf('repair') > -1) return 'Maintenance';
+            if (lowerNote.indexOf('equipment') > -1) return 'Equipment';
+            
             return 'Other';
         }
-
+        
         function parseSplitAmounts(splitStr) {
             if (!splitStr) return null;
             var parts = splitStr.split('+');
@@ -1446,22 +1067,26 @@
             }
             return amounts.length > 0 ? amounts : null;
         }
-
+        
+        // Single expense submission
         document.getElementById('expenseEntryForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
             var expenseNote = document.getElementById('expenseNote').value;
             var expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
             var splitAmounts = document.getElementById('splitAmounts').value;
+            
             var btn = document.getElementById('expenseSubmitBtn');
             btn.disabled = true;
             btn.textContent = 'Saving...';
-
+            
             var splits = parseSplitAmounts(splitAmounts);
-            var promises = [];
-
+            
             if (splits && splits.length > 0) {
+                var promises = [];
                 var firstAmount = splits[0];
                 var remainingAmounts = splits.slice(1);
+                
                 if (firstAmount === 6000) {
                     promises.push(saveToGoogleSheets({
                         date: document.getElementById('expenseDate').value,
@@ -1474,66 +1099,85 @@
                         type: 'expense'
                     }));
                 }
-                for (var s = 0; s < remainingAmounts.length; s++) {
-                    var cat = determineCategoryFromNote(expenseNote);
+                
+                for (var i = 0; i < remainingAmounts.length; i++) {
+                    var category = determineCategoryFromNote(expenseNote);
                     promises.push(saveToGoogleSheets({
                         date: document.getElementById('expenseDate').value,
                         vendor: document.getElementById('vendor').value || '',
                         description: expenseNote || 'Expense',
-                        category: cat,
-                        amount: remainingAmounts[s],
+                        category: category,
+                        amount: remainingAmounts[i],
                         receiptLink: document.getElementById('receiptLink').value || '',
                         month: document.getElementById('expenseDate').value.substring(0, 7),
                         type: 'expense'
                     }));
                 }
+                
+                Promise.all(promises)
+                    .then(function() {
+                        showMessage('expenseMessage', '✅ Saved ' + promises.length + ' expense(s)!', 'success');
+                        document.getElementById('expenseEntryForm').reset();
+                        document.getElementById('expenseDate').valueAsDate = new Date();
+                    })
+                    .catch(function(error) {
+                        showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+                    })
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.textContent = '💾 Save Expense';
+                    });
             } else {
-                var cat = determineCategoryFromNote(expenseNote);
-                var desc = expenseNote;
+                var category = determineCategoryFromNote(expenseNote);
+                var description = expenseNote;
+                
                 if (expenseAmount === 6000 && !expenseNote) {
-                    cat = 'Payroll';
-                    desc = 'Gym Attendant Meals';
+                    category = 'Payroll';
+                    description = 'Gym Attendant Meals';
                 }
-                promises.push(saveToGoogleSheets({
+                
+                saveToGoogleSheets({
                     date: document.getElementById('expenseDate').value,
                     vendor: document.getElementById('vendor').value || '',
-                    description: desc,
-                    category: cat,
+                    description: description,
+                    category: category,
                     amount: expenseAmount,
                     receiptLink: document.getElementById('receiptLink').value || '',
                     month: document.getElementById('expenseDate').value.substring(0, 7),
                     type: 'expense'
-                }));
+                })
+                    .then(function() {
+                        showMessage('expenseMessage', '✅ ' + description + ' - ' + category + ': ' + expenseAmount, 'success');
+                        document.getElementById('expenseEntryForm').reset();
+                        document.getElementById('expenseDate').valueAsDate = new Date();
+                    })
+                    .catch(function(error) {
+                        showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+                    })
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.textContent = '💾 Save Expense';
+                    });
             }
-
-            Promise.all(promises)
-                .then(function() {
-                    showMessage('expenseMessage', '✅ Saved ' + promises.length + ' expense(s)!', 'success');
-                    document.getElementById('expenseEntryForm').reset();
-                    document.getElementById('expenseDate').valueAsDate = new Date();
-                })
-                .catch(function(error) {
-                    showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.textContent = '💾 Save Expense';
-                });
         });
-
-        // ─── EXPENSE BATCH ───
+        
+        // Expense batch functions
         function toggleExpenseBatch() {
             var batchForm = document.getElementById('expenseBatchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('expenseBatchEntries').children.length === 0) {
-                addExpenseBatchEntry();
+            if (batchForm.classList.contains('active')) {
+                batchForm.classList.remove('active');
+            } else {
+                batchForm.classList.add('active');
+                if (document.getElementById('expenseBatchEntries').children.length === 0) {
+                    addExpenseBatchEntry();
+                }
             }
         }
-
+        
         function addExpenseBatchEntry() {
             var container = document.getElementById('expenseBatchEntries');
             var id = expenseBatchCounter;
-            var today = new Date().toISOString().slice(0, 10);
+            var today = new Date().toISOString().slice(0,10);
             var entryDiv = document.createElement('div');
             entryDiv.className = 'batch-entry';
             entryDiv.id = 'expense-batch-' + id;
@@ -1547,31 +1191,34 @@
             container.appendChild(entryDiv);
             expenseBatchCounter++;
         }
-
+        
         function removeExpenseBatchEntry(id) {
-            var el = document.getElementById('expense-batch-' + id);
-            if (el) el.remove();
+            var element = document.getElementById('expense-batch-' + id);
+            if (element) element.remove();
         }
-
+        
         function submitExpenseBatch() {
-            var entries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
+            var batchEntries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
             var allPromises = [];
             var totalExpenses = 0;
-
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
+            
+            for (var i = 0; i < batchEntries.length; i++) {
+                var entry = batchEntries[i];
                 var date = entry.querySelector('.batch-expense-date').value;
                 var vendor = entry.querySelector('.batch-expense-vendor').value;
                 var note = entry.querySelector('.batch-expense-note').value;
                 var amount = parseFloat(entry.querySelector('.batch-expense-amount').value);
                 var splitStr = entry.querySelector('.batch-expense-split').value;
+                
                 if (!date || !note) continue;
-                var month = date.substring(0, 7);
+                
                 var splits = parseSplitAmounts(splitStr);
-
+                var month = date.substring(0, 7);
+                
                 if (splits && splits.length > 0) {
                     var firstAmount = splits[0];
                     var remainingAmounts = splits.slice(1);
+                    
                     if (firstAmount === 6000) {
                         allPromises.push(saveToGoogleSheets({
                             date: date, vendor: vendor, description: 'Gym Attendant Meals',
@@ -1580,38 +1227,43 @@
                         }));
                         totalExpenses++;
                     }
+                    
                     for (var s = 0; s < remainingAmounts.length; s++) {
-                        var cat = determineCategoryFromNote(note);
+                        var category = determineCategoryFromNote(note);
                         allPromises.push(saveToGoogleSheets({
                             date: date, vendor: vendor, description: note || 'Expense',
-                            category: cat, amount: remainingAmounts[s], receiptLink: '',
+                            category: category, amount: remainingAmounts[s], receiptLink: '',
                             month: month, type: 'expense'
                         }));
                         totalExpenses++;
                     }
                 } else if (amount > 0) {
-                    var cat = determineCategoryFromNote(note);
-                    var desc = note;
-                    if (amount === 6000 && !note) { cat = 'Payroll';
-                        desc = 'Gym Attendant Meals'; }
+                    var category = determineCategoryFromNote(note);
+                    var description = note;
+                    
+                    if (amount === 6000 && !note) {
+                        category = 'Payroll';
+                        description = 'Gym Attendant Meals';
+                    }
+                    
                     allPromises.push(saveToGoogleSheets({
-                        date: date, vendor: vendor, description: desc,
-                        category: cat, amount: amount, receiptLink: '',
+                        date: date, vendor: vendor, description: description,
+                        category: category, amount: amount, receiptLink: '',
                         month: month, type: 'expense'
                     }));
                     totalExpenses++;
                 }
             }
-
+            
             if (allPromises.length === 0) {
                 showMessage('expenseMessage', 'No valid expenses to save', 'error');
                 return;
             }
-
+            
             var saveBtn = document.querySelector('#expenseBatchForm button:last-child');
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
-
+            
             Promise.all(allPromises)
                 .then(function() {
                     showMessage('expenseMessage', '✅ Saved ' + totalExpenses + ' expense(s)!', 'success');
@@ -1627,42 +1279,26 @@
                     saveBtn.textContent = '💾 Save All Expenses';
                 });
         }
-
-        // ─── INIT ───
+        
+        // ========== HELPER FUNCTIONS ==========
+        function showMessage(elementId, msg, type) {
+            var messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = msg;
+            messageDiv.className = 'message ' + type;
+            setTimeout(function() {
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+        
+        // Set default dates
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('month').value = new Date().toISOString().slice(0, 7);
         document.getElementById('expenseDate').valueAsDate = new Date();
-
+        
+        // Initialize
         initGymInfo();
         loadData();
         loadSavedImage();
-
-        // ─── ADD TOAST STYLES DYNAMICALLY ───
-        var styleSheet = document.createElement('style');
-        styleSheet.textContent =
-            `
-            .toast-notification {
-                position: fixed;
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.8);
-                color: #ff6b6b;
-                padding: 10px 20px;
-                border-radius: 30px;
-                font-size: 14px;
-                z-index: 2000;
-                pointer-events: none;
-                white-space: nowrap;
-                animation: toastFadeOut 2s ease forwards;
-            }
-            @keyframes toastFadeOut {
-                0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                70% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
-            `;
-        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>
