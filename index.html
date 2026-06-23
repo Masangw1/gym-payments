@@ -1119,17 +1119,24 @@
             tbody.innerHTML = html;
         }
 
-        // ─── GOOGLE SHEETS SAVE ───
-        function saveToGoogleSheets(data) {
+        // ─── WORKER API SAVE ───
+        function saveToWorker(data) {
             return fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            .then(function(response) { return response.json(); })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.text().then(function(text) {
+                        throw new Error('Worker error: ' + response.status + ' - ' + text);
+                    });
+                }
+                return response.json();
+            })
             .then(function(result) {
                 if (!result.success) {
-                    throw new Error(result.error || 'Unknown error');
+                    throw new Error(result.error || 'Unknown error from worker');
                 }
                 return result;
             });
@@ -1232,7 +1239,7 @@
             btn.disabled = true;
             btn.textContent = 'Saving...';
 
-            saveToGoogleSheets(payment)
+            saveToWorker(payment)
                 .then(function(result) {
                     // Generate transaction ID
                     var counter = incrementTransactionCounter();
@@ -1322,7 +1329,6 @@
         function submitBatch() {
             var entries = document.querySelectorAll('.batch-entry');
             var allPromises = [];
-            var savedCount = 0;
             var paymentsToSave = [];
 
             for (var i = 0; i < entries.length; i++) {
@@ -1354,15 +1360,13 @@
             showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
 
             for (var j = 0; j < paymentsToSave.length; j++) {
-                var p = paymentsToSave[j];
-                allPromises.push(
-                    saveToGoogleSheets(p)
-                    .then(function(result) {
-                        // We need to capture the payment that was saved
-                        // We'll use a closure with index
-                    })
-                    .catch(function(err) { throw err; })
-                );
+                (function(p) {
+                    allPromises.push(
+                        saveToWorker(p)
+                        .then(function() { /* success */ })
+                        .catch(function(err) { throw err; })
+                    );
+                })(paymentsToSave[j]);
             }
 
             Promise.all(allPromises)
@@ -1435,7 +1439,7 @@
                 var firstAmount = splits[0];
                 var remainingAmounts = splits.slice(1);
                 if (firstAmount === 6000) {
-                    promises.push(saveToGoogleSheets({
+                    promises.push(saveToWorker({
                         date: document.getElementById('expenseDate').value,
                         vendor: document.getElementById('vendor').value || '',
                         description: 'Gym Attendant Meals',
@@ -1448,7 +1452,7 @@
                 }
                 for (var s = 0; s < remainingAmounts.length; s++) {
                     var cat = determineCategoryFromNote(expenseNote);
-                    promises.push(saveToGoogleSheets({
+                    promises.push(saveToWorker({
                         date: document.getElementById('expenseDate').value,
                         vendor: document.getElementById('vendor').value || '',
                         description: expenseNote || 'Expense',
@@ -1466,7 +1470,7 @@
                     cat = 'Payroll';
                     desc = 'Gym Attendant Meals';
                 }
-                promises.push(saveToGoogleSheets({
+                promises.push(saveToWorker({
                     date: document.getElementById('expenseDate').value,
                     vendor: document.getElementById('vendor').value || '',
                     description: desc,
@@ -1545,7 +1549,7 @@
                     var firstAmount = splits[0];
                     var remainingAmounts = splits.slice(1);
                     if (firstAmount === 6000) {
-                        allPromises.push(saveToGoogleSheets({
+                        allPromises.push(saveToWorker({
                             date: date, vendor: vendor, description: 'Gym Attendant Meals',
                             category: 'Payroll', amount: firstAmount, receiptLink: '',
                             month: month, type: 'expense'
@@ -1554,7 +1558,7 @@
                     }
                     for (var s = 0; s < remainingAmounts.length; s++) {
                         var cat = determineCategoryFromNote(note);
-                        allPromises.push(saveToGoogleSheets({
+                        allPromises.push(saveToWorker({
                             date: date, vendor: vendor, description: note || 'Expense',
                             category: cat, amount: remainingAmounts[s], receiptLink: '',
                             month: month, type: 'expense'
@@ -1566,7 +1570,7 @@
                     var desc = note;
                     if (amount === 6000 && !note) { cat = 'Payroll';
                         desc = 'Gym Attendant Meals'; }
-                    allPromises.push(saveToGoogleSheets({
+                    allPromises.push(saveToWorker({
                         date: date, vendor: vendor, description: desc,
                         category: cat, amount: amount, receiptLink: '',
                         month: month, type: 'expense'
