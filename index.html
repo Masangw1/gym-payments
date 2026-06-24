@@ -1800,1522 +1800,750 @@
     </div>
 
     <script>
-        // ═══════════════════════════════════════════════════
-        //  CONFIGURATION
-        // ═══════════════════════════════════════════════════
+       <script>
+    // ═══════════════════════════════════════════════════
+    //  CONFIGURATION
+    // ═══════════════════════════════════════════════════
 
-        var WORKER_URL = 'https://gym-api-proxy.mmasangwi.workers.dev';
+    var WORKER_URL = 'https://gym-api-proxy.mmasangwi.workers.dev';   // ← correct URL
 
-        var GYM_NAME = '💪 The GYMnasium';
-        var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
-        var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
+    var GYM_NAME = '💪 The GYMnasium';
+    var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
+    var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
 
-        var BANNER_IMAGES = [
-            'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1200&h=250&fit=crop'
-        ];
-        var currentBannerIndex = 0;
+    var BANNER_IMAGES = [
+        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=250&fit=crop',
+        'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&h=250&fit=crop',
+        'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=1200&h=250&fit=crop',
+        'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&h=250&fit=crop',
+        'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1200&h=250&fit=crop'
+    ];
+    var currentBannerIndex = 0;
 
-        var payments = [];
-        var batchCounter = 1;
-        var expenseBatchCounter = 1;
+    var payments = [];
+    var batchCounter = 1;
+    var expenseBatchCounter = 1;
 
-        // ─── TRANSACTION ID COUNTER ───
-        function getTransactionCounter() {
-            var val = localStorage.getItem('gymTransactionCounter');
-            return val ? parseInt(val, 10) : 0;
+    // ─── TRANSACTION ID COUNTER ───
+    function getTransactionCounter() {
+        var val = localStorage.getItem('gymTransactionCounter');
+        return val ? parseInt(val, 10) : 0;
+    }
+
+    function incrementTransactionCounter() {
+        var next = getTransactionCounter() + 1;
+        localStorage.setItem('gymTransactionCounter', String(next));
+        return next;
+    }
+
+    function generateTransactionId(counter) {
+        var year = new Date().getFullYear();
+        var padded = String(counter).padStart(3, '0');
+        return 'GYM-' + year + '-' + padded;
+    }
+
+    // ─── GYM INFO ───
+    function initGymInfo() {
+        document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
+        document.getElementById('gymTagline').innerText = GYM_TAGLINE;
+        document.getElementById('receiptGymName').innerText = GYM_NAME;
+        document.getElementById('receiptGymTagline').innerText = GYM_TAGLINE;
+    }
+
+    function saveGymInfo() {
+        var newDescription = document.getElementById('adminDescription').value;
+        var newTagline = document.getElementById('adminTagline').value;
+        if (newDescription) {
+            document.getElementById('gymDescription').innerText = newDescription;
+            GYM_DESCRIPTION = newDescription;
         }
-
-        function incrementTransactionCounter() {
-            var next = getTransactionCounter() + 1;
-            localStorage.setItem('gymTransactionCounter', String(next));
-            return next;
+        if (newTagline) {
+            document.getElementById('gymTagline').innerText = newTagline;
+            GYM_TAGLINE = newTagline;
+            document.getElementById('receiptGymTagline').innerText = newTagline;
         }
+        showMessage('message', '✅ Gym information saved!', 'success');
+        showToast('✅ Gym info saved');
+    }
 
-        function generateTransactionId(counter) {
-            var year = new Date().getFullYear();
-            var padded = String(counter).padStart(3, '0');
-            return 'GYM-' + year + '-' + padded;
-        }
+    // ─── DOUBLE-TAP ADMIN ───
+    var tapCount = 0;
+    var tapTimer;
 
-        // ─── GYM INFO ───
-        function initGymInfo() {
-            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
-            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
-            document.getElementById('receiptGymName').innerText = GYM_NAME;
-            document.getElementById('receiptGymTagline').innerText = GYM_TAGLINE;
-        }
-
-        function saveGymInfo() {
-            var newDescription = document.getElementById('adminDescription').value;
-            var newTagline = document.getElementById('adminTagline').value;
-            if (newDescription) {
-                document.getElementById('gymDescription').innerText = newDescription;
-                GYM_DESCRIPTION = newDescription;
-            }
-            if (newTagline) {
-                document.getElementById('gymTagline').innerText = newTagline;
-                GYM_TAGLINE = newTagline;
-                document.getElementById('receiptGymTagline').innerText = newTagline;
-            }
-            showMessage('message', '✅ Gym information saved!', 'success');
-            showToast('✅ Gym info saved');
-        }
-
-        // ─── DOUBLE-TAP ADMIN ───
-        var tapCount = 0;
-        var tapTimer;
-
-        function showToast(message) {
-            var existing = document.querySelector('.toast-notification');
-            if (existing) existing.remove();
-            var toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = message;
-            Object.assign(toast.style, {
-                position: 'fixed',
-                bottom: '80px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(0,0,0,0.8)',
-                color: '#ff6b6b',
-                padding: '10px 20px',
-                borderRadius: '30px',
-                fontSize: '14px',
-                zIndex: '2000',
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-                animation: 'fadeOut 2s ease forwards'
-            });
-            document.body.appendChild(toast);
-            setTimeout(function() { if (toast && toast.parentNode) toast.remove(); }, 2000);
-        }
-
-        function toggleHiddenAdmin() {
-            var panel = document.getElementById('hiddenAdmin');
-            panel.classList.toggle('active');
-            if (panel.classList.contains('active')) {
-                document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
-                document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
-                showToast('🔧 Admin Panel Opened');
-            } else {
-                showToast('🔧 Admin Panel Closed');
-            }
-        }
-
-        document.getElementById('adminTriggerHeader').addEventListener('click', function() {
-            tapCount++;
-            if (tapCount === 1) {
-                tapTimer = setTimeout(function() { tapCount = 0; }, 300);
-            } else if (tapCount === 2) {
-                clearTimeout(tapTimer);
-                tapCount = 0;
-                toggleHiddenAdmin();
-            }
+    function showToast(message) {
+        var existing = document.querySelector('.toast-notification');
+        if (existing) existing.remove();
+        var toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        Object.assign(toast.style, {
+            position: 'fixed',
+            bottom: '80px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.8)',
+            color: '#ff6b6b',
+            padding: '10px 20px',
+            borderRadius: '30px',
+            fontSize: '14px',
+            zIndex: '2000',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+            animation: 'fadeOut 2s ease forwards'
         });
+        document.body.appendChild(toast);
+        setTimeout(function() { if (toast && toast.parentNode) toast.remove(); }, 2000);
+    }
 
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                e.preventDefault();
-                toggleHiddenAdmin();
-            }
-        });
-
-        // ─── BANNER & LOGO ───
-        function changeBannerImage() {
-            currentBannerIndex = (currentBannerIndex + 1) % BANNER_IMAGES.length;
-            document.getElementById('gymBanner').src = BANNER_IMAGES[currentBannerIndex];
-            localStorage.setItem('gymBannerImage', BANNER_IMAGES[currentBannerIndex]);
-            showMessage('message', '✅ Banner image changed!', 'success');
-            showToast('🖼️ Banner changed');
+    function toggleHiddenAdmin() {
+        var panel = document.getElementById('hiddenAdmin');
+        panel.classList.toggle('active');
+        if (panel.classList.contains('active')) {
+            document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
+            document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
+            showToast('🔧 Admin Panel Opened');
+        } else {
+            showToast('🔧 Admin Panel Closed');
         }
+    }
 
-        function loadSavedImage() {
-            var saved = localStorage.getItem('gymBannerImage');
-            if (saved) {
-                document.getElementById('gymBanner').src = saved;
-                for (var i = 0; i < BANNER_IMAGES.length; i++) {
-                    if (BANNER_IMAGES[i] === saved) { currentBannerIndex = i; break; }
-                }
-            }
-            var logo = localStorage.getItem('gymLogo');
-            if (logo) document.getElementById('gymLogo').src = logo;
+    document.getElementById('adminTriggerHeader').addEventListener('click', function() {
+        tapCount++;
+        if (tapCount === 1) {
+            tapTimer = setTimeout(function() { tapCount = 0; }, 300);
+        } else if (tapCount === 2) {
+            clearTimeout(tapTimer);
+            tapCount = 0;
+            toggleHiddenAdmin();
         }
+    });
 
-        document.getElementById('adminLogoUpload').addEventListener('change', function(event) {
-            var file = event.target.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var url = e.target.result;
-                    document.getElementById('gymLogo').src = url;
-                    localStorage.setItem('gymLogo', url);
-                    showMessage('message', '✅ Gym logo uploaded!', 'success');
-                    showToast('✅ Logo uploaded');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function resetLogo() {
-            var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
-            document.getElementById('gymLogo').src = defaultLogo;
-            localStorage.removeItem('gymLogo');
-            showMessage('message', '✅ Logo reset to default!', 'success');
-            showToast('✅ Logo reset');
-        }
-
-        // ─── TABS ───
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-            document.querySelectorAll('.form-card').forEach(function(f) { f.classList.remove('active'); });
-            if (tab === 'payment') {
-                document.querySelectorAll('.tab')[0].classList.add('active');
-                document.getElementById('paymentForm').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab')[1].classList.add('active');
-                document.getElementById('expenseForm').classList.add('active');
-            }
-        }
-
-        // ─── PAYMENT DATA ───
-        function loadData() {
-            var saved = localStorage.getItem('gymPayments');
-            if (saved) {
-                payments = JSON.parse(saved);
-            }
-            renderTable();
-            updateStats();
-        }
-
-        function saveData() {
-            localStorage.setItem('gymPayments', JSON.stringify(payments));
-            updateStats();
-        }
-
-        function updateStats() {
-            document.getElementById('paymentCount').innerText = payments.length;
-        }
-
-        function renderTable() {
-            var tbody = document.getElementById('tableBody');
-            if (payments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No payments recorded</td></tr>';
-                return;
-            }
-            var html = '';
-            for (var i = payments.length - 1; i >= 0; i--) {
-                var p = payments[i];
-                html += '<tr>';
-                html += '<td><strong>' + (p.transactionId || '—') + '</strong></td>';
-                html += '<td>' + p.date + '</td>';
-                html += '<td>' + p.paymentType + '</td>';
-                html += '<td>' + p.memberName + '</td>';
-                html += '<td>' + p.amount + '</td>';
-                html += '<td>' + p.paymentMethod + '</td>';
-                html += '<td>' + p.month + '</td>';
-                html += '</tr>';
-            }
-            tbody.innerHTML = html;
-        }
-
-        // ─── WORKER API SAVE ───
-        function saveToWorker(data) {
-            return fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(function(response) {
-                if (!response.ok) {
-                    return response.text().then(function(text) {
-                        throw new Error('Worker error: ' + response.status + ' - ' + text);
-                    });
-                }
-                return response.json();
-            })
-            .then(function(result) {
-                if (!result.success) {
-                    throw new Error(result.error || 'Unknown error from worker');
-                }
-                return result;
-            });
-        }
-
-        // ─── MESSAGE HELPER ───
-        function showMessage(elementId, msg, type) {
-            var div = document.getElementById(elementId);
-            div.textContent = msg;
-            div.className = 'message ' + type;
-            setTimeout(function() { div.className = 'message'; }, 6000);
-        }
-
-        // ─── RECEIPT FUNCTIONS ───
-        var lastReceiptData = null;
-
-        function showReceipt(payment, transactionId) {
-            // Fill receipt
-            document.getElementById('receiptNumber').textContent = '# ' + transactionId;
-            document.getElementById('receiptDate').textContent = '📅 ' + payment.date;
-            document.getElementById('receiptMember').textContent = payment.memberName;
-            document.getElementById('receiptType').textContent = payment.paymentType;
-            document.getElementById('receiptMethod').textContent = payment.paymentMethod;
-            document.getElementById('receiptMonth').textContent = payment.month;
-            document.getElementById('receiptAmount').textContent = 'K ' + parseFloat(payment.amount).toFixed(2);
-
-            // Class (optional)
-            var classRow = document.getElementById('receiptClassRow');
-            var classVal = document.getElementById('receiptClass');
-            if (payment.classType) {
-                classRow.style.display = 'flex';
-                classVal.textContent = payment.classType;
-            } else {
-                classRow.style.display = 'none';
-            }
-
-            // Notes (optional)
-            var notesRow = document.getElementById('receiptNotesRow');
-            var notesVal = document.getElementById('receiptNotes');
-            if (payment.notes && payment.notes.trim()) {
-                notesRow.style.display = 'flex';
-                notesVal.textContent = payment.notes.trim();
-            } else {
-                notesRow.style.display = 'none';
-            }
-
-            // Gym name & tagline (from current settings)
-            document.getElementById('receiptGymName').textContent = GYM_NAME;
-            document.getElementById('receiptGymTagline').textContent = GYM_TAGLINE;
-
-            // Store for print
-            lastReceiptData = { payment: payment, transactionId: transactionId };
-
-            // Show overlay
-            var overlay = document.getElementById('receiptOverlay');
-            overlay.classList.add('open');
-        }
-
-        function closeReceipt() {
-            document.getElementById('receiptOverlay').classList.remove('open');
-        }
-
-        function printReceipt() {
-            window.print();
-        }
-
-        // Auto-print after a short delay (so DOM renders)
-        function autoPrintReceipt() {
-            setTimeout(function() {
-                window.print();
-            }, 400);
-        }
-
-        // ─── PAYMENT SUBMISSION ───
-        document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'A') {
             e.preventDefault();
+            toggleHiddenAdmin();
+        }
+    });
 
-            var memberName = document.getElementById('memberName').value;
-            var classType = document.getElementById('classType').value;
-            var displayName = memberName;
-            if (classType) {
-                displayName = memberName + ' (' + classType + ')';
+    // ─── BANNER & LOGO ───
+    function changeBannerImage() {
+        currentBannerIndex = (currentBannerIndex + 1) % BANNER_IMAGES.length;
+        document.getElementById('gymBanner').src = BANNER_IMAGES[currentBannerIndex];
+        localStorage.setItem('gymBannerImage', BANNER_IMAGES[currentBannerIndex]);
+        showMessage('message', '✅ Banner image changed!', 'success');
+        showToast('🖼️ Banner changed');
+    }
+
+    function loadSavedImage() {
+        var saved = localStorage.getItem('gymBannerImage');
+        if (saved) {
+            document.getElementById('gymBanner').src = saved;
+            for (var i = 0; i < BANNER_IMAGES.length; i++) {
+                if (BANNER_IMAGES[i] === saved) { currentBannerIndex = i; break; }
             }
-            var memberId = document.getElementById('memberId').value;
+        }
+        var logo = localStorage.getItem('gymLogo');
+        if (logo) document.getElementById('gymLogo').src = logo;
+    }
 
-            var payment = {
-                date: document.getElementById('date').value,
-                paymentType: document.getElementById('paymentType').value,
-                memberId: memberId || '',
-                memberName: displayName,
-                amount: parseFloat(document.getElementById('amount').value),
-                paymentMethod: document.getElementById('paymentMethod').value,
-                month: document.getElementById('month').value,
-                notes: document.getElementById('notes').value || '',
-                classType: classType || '',
-                type: 'payment'
+    document.getElementById('adminLogoUpload').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var url = e.target.result;
+                document.getElementById('gymLogo').src = url;
+                localStorage.setItem('gymLogo', url);
+                showMessage('message', '✅ Gym logo uploaded!', 'success');
+                showToast('✅ Logo uploaded');
             };
+            reader.readAsDataURL(file);
+        }
+    });
 
-            var btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
+    function resetLogo() {
+        var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
+        document.getElementById('gymLogo').src = defaultLogo;
+        localStorage.removeItem('gymLogo');
+        showMessage('message', '✅ Logo reset to default!', 'success');
+        showToast('✅ Logo reset');
+    }
 
-            saveToWorker(payment)
-                .then(function(result) {
-                    // Generate transaction ID
-                    var counter = incrementTransactionCounter();
-                    var transactionId = generateTransactionId(counter);
-                    payment.transactionId = transactionId;
+    // ─── TABS ───
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.form-card').forEach(function(f) { f.classList.remove('active'); });
+        if (tab === 'payment') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('paymentForm').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('expenseForm').classList.add('active');
+        }
+    }
 
-                    // Save locally
-                    payments.push(payment);
-                    saveData();
-                    renderTable();
+    // ─── PAYMENT DATA ───
+    function loadData() {
+        var saved = localStorage.getItem('gymPayments');
+        if (saved) {
+            payments = JSON.parse(saved);
+        }
+        renderTable();
+        updateStats();
+    }
 
-                    var memberMsg = result.memberId ? ' (Member: ' + result.memberId + ')' : '';
-                    showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount + memberMsg + ' · ' + transactionId, 'success');
+    function saveData() {
+        localStorage.setItem('gymPayments', JSON.stringify(payments));
+        updateStats();
+    }
 
-                    // ─── SHOW RECEIPT ───
-                    showReceipt(payment, transactionId);
+    function updateStats() {
+        document.getElementById('paymentCount').innerText = payments.length;
+    }
 
-                    // ─── AUTO-PRINT ───
-                    var autoPrint = document.getElementById('autoPrintToggle').checked;
-                    if (autoPrint) {
-                        autoPrintReceipt();
-                    }
+    function renderTable() {
+        var tbody = document.getElementById('tableBody');
+        if (payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No payments recorded</td></tr>';
+            return;
+        }
+        var html = '';
+        for (var i = payments.length - 1; i >= 0; i--) {
+            var p = payments[i];
+            html += '<tr>';
+            html += '<td><strong>' + (p.transactionId || '—') + '</strong></td>';
+            html += '<td>' + p.date + '</td>';
+            html += '<td>' + p.paymentType + '</td>';
+            html += '<td>' + p.memberName + '</td>';
+            html += '<td>' + p.amount + '</td>';
+            html += '<td>' + p.paymentMethod + '</td>';
+            html += '<td>' + p.month + '</td>';
+            html += '</tr>';
+        }
+        tbody.innerHTML = html;
+    }
 
-                    // Reset form
-                    document.getElementById('paymentEntryForm').reset();
-                    document.getElementById('date').valueAsDate = new Date();
-                    document.getElementById('month').value = new Date().toISOString().slice(0, 7);
-                    document.getElementById('memberId').value = '';
-                    document.getElementById('classType').value = '';
-                    document.getElementById('notes').value = '';
-                })
-                .catch(function(error) {
-                    showMessage('message', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.textContent = '💾 Save Payment';
+    // ─── WORKER API SAVE ───
+    function saveToWorker(data) {
+        return fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                return response.text().then(function(text) {
+                    throw new Error('Worker error: ' + response.status + ' - ' + text);
                 });
+            }
+            return response.json();
+        })
+        .then(function(result) {
+            if (!result.success) {
+                throw new Error(result.error || 'Unknown error from worker');
+            }
+            return result;
         });
+    }
 
-        // ─── BATCH PAYMENT ───
-        function toggleBatch() {
-            var batchForm = document.getElementById('batchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) {
-                addBatchEntry();
-            }
+    // ─── MESSAGE HELPER ───
+    function showMessage(elementId, msg, type) {
+        var div = document.getElementById(elementId);
+        div.textContent = msg;
+        div.className = 'message ' + type;
+        setTimeout(function() { div.className = 'message'; }, 6000);
+    }
+
+    // ─── RECEIPT FUNCTIONS ───
+    var lastReceiptData = null;
+
+    function showReceipt(payment, transactionId) {
+        document.getElementById('receiptNumber').textContent = '# ' + transactionId;
+        document.getElementById('receiptDate').textContent = '📅 ' + payment.date;
+        document.getElementById('receiptMember').textContent = payment.memberName;
+        document.getElementById('receiptType').textContent = payment.paymentType;
+        document.getElementById('receiptMethod').textContent = payment.paymentMethod;
+        document.getElementById('receiptMonth').textContent = payment.month;
+        document.getElementById('receiptAmount').textContent = 'K ' + parseFloat(payment.amount).toFixed(2);
+
+        var classRow = document.getElementById('receiptClassRow');
+        var classVal = document.getElementById('receiptClass');
+        if (payment.classType) {
+            classRow.style.display = 'flex';
+            classVal.textContent = payment.classType;
+        } else {
+            classRow.style.display = 'none';
         }
 
-        function addBatchEntry() {
-            var container = document.getElementById('batchEntries');
-            var id = batchCounter;
-            var today = new Date().toISOString().slice(0, 10);
-            var currentMonth = new Date().toISOString().slice(0, 7);
-            var entryDiv = document.createElement('div');
-            entryDiv.className = 'batch-entry';
-            entryDiv.id = 'batch-' + id;
-            entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Payment #' + id + '</h4>' +
-                '<div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div>' +
-                '<div class="form-group"><label>Type</label>' +
-                '<select class="batch-type">' +
-                '<option value="Monthly Subscription">Monthly Subscription</option>' +
-                '<option value="Drop-in">Drop-in</option>' +
-                '<option value="Class Fee">Class Fee</option>' +
-                '<option value="Late Fee">Late Fee</option>' +
-                '</select></div>' +
-                '<div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>' +
-                '<div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>' +
-                '<div class="form-group"><label>Method</label>' +
-                '<select class="batch-method">' +
-                '<option value="Cash">Cash</option>' +
-                '<option value="Airtel Money">Airtel Money</option>' +
-                '<option value="Bank Transfer">Bank Transfer</option>' +
-                '</select></div>' +
-                '<div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + currentMonth + '"></div>' +
-                '<div class="form-group"><label>Class</label><input type="text" class="batch-class" placeholder="Optional"></div>' +
-                '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
-            container.appendChild(entryDiv);
-            batchCounter++;
+        var notesRow = document.getElementById('receiptNotesRow');
+        var notesVal = document.getElementById('receiptNotes');
+        if (payment.notes && payment.notes.trim()) {
+            notesRow.style.display = 'flex';
+            notesVal.textContent = payment.notes.trim();
+        } else {
+            notesRow.style.display = 'none';
         }
 
-        function removeBatchEntry(id) {
-            var el = document.getElementById('batch-' + id);
-            if (el) el.remove();
+        document.getElementById('receiptGymName').textContent = GYM_NAME;
+        document.getElementById('receiptGymTagline').textContent = GYM_TAGLINE;
+
+        lastReceiptData = { payment: payment, transactionId: transactionId };
+
+        var overlay = document.getElementById('receiptOverlay');
+        overlay.classList.add('open');
+    }
+
+    function closeReceipt() {
+        document.getElementById('receiptOverlay').classList.remove('open');
+    }
+
+    function printReceipt() {
+        window.print();
+    }
+
+    function autoPrintReceipt() {
+        setTimeout(function() {
+            window.print();
+        }, 400);
+    }
+
+    // ─── PAYMENT SUBMISSION ───
+    document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var memberName = document.getElementById('memberName').value;
+        var classType = document.getElementById('classType').value;
+        var displayName = memberName;
+        if (classType) {
+            displayName = memberName + ' (' + classType + ')';
         }
+        var memberId = document.getElementById('memberId').value;
 
-        function submitBatch() {
-            var entries = document.querySelectorAll('.batch-entry');
-            var allPromises = [];
-            var paymentsToSave = [];
+        var payment = {
+            date: document.getElementById('date').value,
+            paymentType: document.getElementById('paymentType').value,
+            memberId: memberId || '',
+            memberName: displayName,
+            amount: parseFloat(document.getElementById('amount').value),
+            paymentMethod: document.getElementById('paymentMethod').value,
+            month: document.getElementById('month').value,
+            notes: document.getElementById('notes').value || '',
+            classType: classType || '',
+            type: 'payment'
+        };
 
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var name = entry.querySelector('.batch-name').value;
-                var amount = entry.querySelector('.batch-amount').value;
-                if (name && amount) {
-                    var payment = {
-                        date: entry.querySelector('.batch-date').value,
-                        paymentType: entry.querySelector('.batch-type').value,
-                        memberId: '',
-                        memberName: name.trim(),
-                        amount: parseFloat(amount),
-                        paymentMethod: entry.querySelector('.batch-method').value,
-                        month: entry.querySelector('.batch-month').value,
-                        notes: 'Batch entry',
-                        classType: entry.querySelector('.batch-class').value || '',
-                        type: 'payment'
-                    };
-                    paymentsToSave.push(payment);
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        saveToWorker(payment)
+            .then(function(result) {
+                var counter = incrementTransactionCounter();
+                var transactionId = generateTransactionId(counter);
+                payment.transactionId = transactionId;
+
+                payments.push(payment);
+                saveData();
+                renderTable();
+
+                var memberMsg = result.memberId ? ' (Member: ' + result.memberId + ')' : '';
+                showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount + memberMsg + ' · ' + transactionId, 'success');
+
+                showReceipt(payment, transactionId);
+
+                var autoPrint = document.getElementById('autoPrintToggle').checked;
+                if (autoPrint) {
+                    autoPrintReceipt();
                 }
+
+                document.getElementById('paymentEntryForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+                document.getElementById('memberId').value = '';
+                document.getElementById('classType').value = '';
+                document.getElementById('notes').value = '';
+            })
+            .catch(function(error) {
+                showMessage('message', '❌ Error: ' + error.message, 'error');
+            })
+            .finally(function() {
+                btn.disabled = false;
+                btn.textContent = '💾 Save Payment';
+            });
+    });
+
+    // ─── BATCH PAYMENT ───
+    function toggleBatch() {
+        var batchForm = document.getElementById('batchForm');
+        batchForm.classList.toggle('active');
+        if (batchForm.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) {
+            addBatchEntry();
+        }
+    }
+
+    function addBatchEntry() {
+        var container = document.getElementById('batchEntries');
+        var id = batchCounter;
+        var today = new Date().toISOString().slice(0, 10);
+        var currentMonth = new Date().toISOString().slice(0, 7);
+        var entryDiv = document.createElement('div');
+        entryDiv.className = 'batch-entry';
+        entryDiv.id = 'batch-' + id;
+        entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Payment #' + id + '</h4>' +
+            '<div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div>' +
+            '<div class="form-group"><label>Type</label>' +
+            '<select class="batch-type">' +
+            '<option value="Monthly Subscription">Monthly Subscription</option>' +
+            '<option value="Drop-in">Drop-in</option>' +
+            '<option value="Class Fee">Class Fee</option>' +
+            '<option value="Late Fee">Late Fee</option>' +
+            '</select></div>' +
+            '<div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>' +
+            '<div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>' +
+            '<div class="form-group"><label>Method</label>' +
+            '<select class="batch-method">' +
+            '<option value="Cash">Cash</option>' +
+            '<option value="Airtel Money">Airtel Money</option>' +
+            '<option value="Bank Transfer">Bank Transfer</option>' +
+            '</select></div>' +
+            '<div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + currentMonth + '"></div>' +
+            '<div class="form-group"><label>Class</label><input type="text" class="batch-class" placeholder="Optional"></div>' +
+            '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
+        container.appendChild(entryDiv);
+        batchCounter++;
+    }
+
+    function removeBatchEntry(id) {
+        var el = document.getElementById('batch-' + id);
+        if (el) el.remove();
+    }
+
+    function submitBatch() {
+        var entries = document.querySelectorAll('.batch-entry');
+        var allPromises = [];
+        var paymentsToSave = [];
+
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            var name = entry.querySelector('.batch-name').value;
+            var amount = entry.querySelector('.batch-amount').value;
+            if (name && amount) {
+                var payment = {
+                    date: entry.querySelector('.batch-date').value,
+                    paymentType: entry.querySelector('.batch-type').value,
+                    memberId: '',
+                    memberName: name.trim(),
+                    amount: parseFloat(amount),
+                    paymentMethod: entry.querySelector('.batch-method').value,
+                    month: entry.querySelector('.batch-month').value,
+                    notes: 'Batch entry',
+                    classType: entry.querySelector('.batch-class').value || '',
+                    type: 'payment'
+                };
+                paymentsToSave.push(payment);
             }
-
-            if (paymentsToSave.length === 0) {
-                showMessage('message', 'No valid entries to save', 'error');
-                return;
-            }
-
-            showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
-
-            for (var j = 0; j < paymentsToSave.length; j++) {
-                (function(p) {
-                    allPromises.push(
-                        saveToWorker(p)
-                        .then(function() { /* success */ })
-                        .catch(function(err) { throw err; })
-                    );
-                })(paymentsToSave[j]);
-            }
-
-            Promise.all(allPromises)
-                .then(function() {
-                    // Now assign transaction IDs and save locally
-                    for (var k = 0; k < paymentsToSave.length; k++) {
-                        var counter = incrementTransactionCounter();
-                        paymentsToSave[k].transactionId = generateTransactionId(counter);
-                        payments.push(paymentsToSave[k]);
-                    }
-                    saveData();
-                    renderTable();
-
-                    // Show receipt for the last payment
-                    var last = paymentsToSave[paymentsToSave.length - 1];
-                    showReceipt(last, last.transactionId);
-                    if (document.getElementById('autoPrintToggle').checked) {
-                        autoPrintReceipt();
-                    }
-
-                    showMessage('message', '✅ Saved ' + paymentsToSave.length + ' payment(s)!', 'success');
-                    document.getElementById('batchEntries').innerHTML = '';
-                    batchCounter = 1;
-                    document.getElementById('batchForm').classList.remove('active');
-                })
-                .catch(function(error) {
-                    showMessage('message', '❌ Error: ' + error.message, 'error');
-                });
         }
 
-        // ─── EXPENSE FUNCTIONS ───
-        function determineCategoryFromNote(note) {
-            if (!note) return 'Other';
-            var lower = note.toLowerCase();
-            if (lower.indexOf('mop') > -1) return 'Cleaning';
-            if (lower.indexOf('water') > -1 || lower.indexOf('electric') > -1) return 'Utilities';
-            if (lower.indexOf('rent') > -1) return 'Rent';
-            if (lower.indexOf('salary') > -1 || lower.indexOf('payroll') > -1) return 'Payroll';
-            if (lower.indexOf('marketing') > -1 || lower.indexOf('advert') > -1) return 'Marketing';
-            if (lower.indexOf('cleaning') > -1) return 'Cleaning';
-            if (lower.indexOf('maintenance') > -1 || lower.indexOf('repair') > -1) return 'Maintenance';
-            if (lower.indexOf('equipment') > -1) return 'Equipment';
-            return 'Other';
+        if (paymentsToSave.length === 0) {
+            showMessage('message', 'No valid entries to save', 'error');
+            return;
         }
 
-        function parseSplitAmounts(splitStr) {
-            if (!splitStr) return null;
-            var parts = splitStr.split('+');
-            var amounts = [];
-            for (var i = 0; i < parts.length; i++) {
-                var amt = parseFloat(parts[i]);
-                if (!isNaN(amt) && amt > 0) amounts.push(amt);
-            }
-            return amounts.length > 0 ? amounts : null;
+        showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
+
+        for (var j = 0; j < paymentsToSave.length; j++) {
+            (function(p) {
+                allPromises.push(
+                    saveToWorker(p)
+                    .then(function() { /* success */ })
+                    .catch(function(err) { throw err; })
+                );
+            })(paymentsToSave[j]);
         }
 
-        document.getElementById('expenseEntryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            var expenseNote = document.getElementById('expenseNote').value;
-            var expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
-            var splitAmounts = document.getElementById('splitAmounts').value;
-            var btn = document.getElementById('expenseSubmitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
+        Promise.all(allPromises)
+            .then(function() {
+                for (var k = 0; k < paymentsToSave.length; k++) {
+                    var counter = incrementTransactionCounter();
+                    paymentsToSave[k].transactionId = generateTransactionId(counter);
+                    payments.push(paymentsToSave[k]);
+                }
+                saveData();
+                renderTable();
 
-            var splits = parseSplitAmounts(splitAmounts);
-            var promises = [];
+                var last = paymentsToSave[paymentsToSave.length - 1];
+                showReceipt(last, last.transactionId);
+                if (document.getElementById('autoPrintToggle').checked) {
+                    autoPrintReceipt();
+                }
 
-            if (splits && splits.length > 0) {
-                var firstAmount = splits[0];
-                var remainingAmounts = splits.slice(1);
-                if (firstAmount === 6000) {
-                    promises.push(saveToWorker({
-                        date: document.getElementById('expenseDate').value,
-                        vendor: document.getElementById('vendor').value || '',
-                        description: 'Gym Attendant Meals',
-                        category: 'Payroll',
-                        amount: firstAmount,
-                        receiptLink: document.getElementById('receiptLink').value || '',
-                        month: document.getElementById('expenseDate').value.substring(0, 7),
-                        type: 'expense'
-                    }));
-                }
-                for (var s = 0; s < remainingAmounts.length; s++) {
-                    var cat = determineCategoryFromNote(expenseNote);
-                    promises.push(saveToWorker({
-                        date: document.getElementById('expenseDate').value,
-                        vendor: document.getElementById('vendor').value || '',
-                        description: expenseNote || 'Expense',
-                        category: cat,
-                        amount: remainingAmounts[s],
-                        receiptLink: document.getElementById('receiptLink').value || '',
-                        month: document.getElementById('expenseDate').value.substring(0, 7),
-                        type: 'expense'
-                    }));
-                }
-            } else {
-                var cat = determineCategoryFromNote(expenseNote);
-                var desc = expenseNote;
-                if (expenseAmount === 6000 && !expenseNote) {
-                    cat = 'Payroll';
-                    desc = 'Gym Attendant Meals';
-                }
+                showMessage('message', '✅ Saved ' + paymentsToSave.length + ' payment(s)!', 'success');
+                document.getElementById('batchEntries').innerHTML = '';
+                batchCounter = 1;
+                document.getElementById('batchForm').classList.remove('active');
+            })
+            .catch(function(error) {
+                showMessage('message', '❌ Error: ' + error.message, 'error');
+            });
+    }
+
+    // ─── EXPENSE FUNCTIONS ───
+    function determineCategoryFromNote(note) {
+        if (!note) return 'Other';
+        var lower = note.toLowerCase();
+        if (lower.indexOf('mop') > -1) return 'Cleaning';
+        if (lower.indexOf('water') > -1 || lower.indexOf('electric') > -1) return 'Utilities';
+        if (lower.indexOf('rent') > -1) return 'Rent';
+        if (lower.indexOf('salary') > -1 || lower.indexOf('payroll') > -1) return 'Payroll';
+        if (lower.indexOf('marketing') > -1 || lower.indexOf('advert') > -1) return 'Marketing';
+        if (lower.indexOf('cleaning') > -1) return 'Cleaning';
+        if (lower.indexOf('maintenance') > -1 || lower.indexOf('repair') > -1) return 'Maintenance';
+        if (lower.indexOf('equipment') > -1) return 'Equipment';
+        return 'Other';
+    }
+
+    function parseSplitAmounts(splitStr) {
+        if (!splitStr) return null;
+        var parts = splitStr.split('+');
+        var amounts = [];
+        for (var i = 0; i < parts.length; i++) {
+            var amt = parseFloat(parts[i]);
+            if (!isNaN(amt) && amt > 0) amounts.push(amt);
+        }
+        return amounts.length > 0 ? amounts : null;
+    }
+
+    document.getElementById('expenseEntryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var expenseNote = document.getElementById('expenseNote').value;
+        var expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+        var splitAmounts = document.getElementById('splitAmounts').value;
+        var btn = document.getElementById('expenseSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        var splits = parseSplitAmounts(splitAmounts);
+        var promises = [];
+
+        if (splits && splits.length > 0) {
+            var firstAmount = splits[0];
+            var remainingAmounts = splits.slice(1);
+            if (firstAmount === 6000) {
                 promises.push(saveToWorker({
                     date: document.getElementById('expenseDate').value,
                     vendor: document.getElementById('vendor').value || '',
-                    description: desc,
-                    category: cat,
-                    amount: expenseAmount,
+                    description: 'Gym Attendant Meals',
+                    category: 'Payroll',
+                    amount: firstAmount,
                     receiptLink: document.getElementById('receiptLink').value || '',
                     month: document.getElementById('expenseDate').value.substring(0, 7),
                     type: 'expense'
                 }));
             }
-
-            Promise.all(promises)
-                .then(function() {
-                    showMessage('expenseMessage', '✅ Saved ' + promises.length + ' expense(s)!', 'success');
-                    document.getElementById('expenseEntryForm').reset();
-                    document.getElementById('expenseDate').valueAsDate = new Date();
-                })
-                .catch(function(error) {
-                    showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.textContent = '💾 Save Expense';
-                });
-        });
-
-        // ─── EXPENSE BATCH ───
-        function toggleExpenseBatch() {
-            var batchForm = document.getElementById('expenseBatchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('expenseBatchEntries').children.length === 0) {
-                addExpenseBatchEntry();
-            }
-        }
-
-        function addExpenseBatchEntry() {
-            var container = document.getElementById('expenseBatchEntries');
-            var id = expenseBatchCounter;
-            var today = new Date().toISOString().slice(0, 10);
-            var entryDiv = document.createElement('div');
-            entryDiv.className = 'batch-entry';
-            entryDiv.id = 'expense-batch-' + id;
-            entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Expense #' + id + '</h4>' +
-                '<div class="form-group"><label>Date</label><input type="date" class="batch-expense-date" value="' + today + '"></div>' +
-                '<div class="form-group"><label>Vendor</label><input type="text" class="batch-expense-vendor" placeholder="Optional"></div>' +
-                '<div class="form-group"><label>Description / Note</label><input type="text" class="batch-expense-note" placeholder="e.g., water bill, salaries"></div>' +
-                '<div class="form-group"><label>Amount</label><input type="number" class="batch-expense-amount" step="0.01" placeholder="6000"></div>' +
-                '<div class="form-group"><label>Split Amounts</label><input type="text" class="batch-expense-split" placeholder="e.g., 6000+50000"></div>' +
-                '<button class="remove-btn" onclick="removeExpenseBatchEntry(' + id + ')">Remove</button>';
-            container.appendChild(entryDiv);
-            expenseBatchCounter++;
-        }
-
-        function removeExpenseBatchEntry(id) {
-            var el = document.getElementById('expense-batch-' + id);
-            if (el) el.remove();
-        }
-
-        function submitExpenseBatch() {
-            var entries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
-            var allPromises = [];
-            var totalExpenses = 0;
-
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var date = entry.querySelector('.batch-expense-date').value;
-                var vendor = entry.querySelector('.batch-expense-vendor').value;
-                var note = entry.querySelector('.batch-expense-note').value;
-                var amount = parseFloat(entry.querySelector('.batch-expense-amount').value);
-                var splitStr = entry.querySelector('.batch-expense-split').value;
-                if (!date || !note) continue;
-                var month = date.substring(0, 7);
-                var splits = parseSplitAmounts(splitStr);
-
-                if (splits && splits.length > 0) {
-                    var firstAmount = splits[0];
-                    var remainingAmounts = splits.slice(1);
-                    if (firstAmount === 6000) {
-                        allPromises.push(saveToWorker({
-                            date: date, vendor: vendor, description: 'Gym Attendant Meals',
-                            category: 'Payroll', amount: firstAmount, receiptLink: '',
-                            month: month, type: 'expense'
-                        }));
-                        totalExpenses++;
-                    }
-                    for (var s = 0; s < remainingAmounts.length; s++) {
-                        var cat = determineCategoryFromNote(note);
-                        allPromises.push(saveToWorker({
-                            date: date, vendor: vendor, description: note || 'Expense',
-                            category: cat, amount: remainingAmounts[s], receiptLink: '',
-                            month: month, type: 'expense'
-                        }));
-                        totalExpenses++;
-                    }
-                } else if (amount > 0) {
-                    var cat = determineCategoryFromNote(note);
-                    var desc = note;
-                    if (amount === 6000 && !note) { cat = 'Payroll';
-                        desc = 'Gym Attendant Meals'; }
-                    allPromises.push(saveToWorker({
-                        date: date, vendor: vendor, description: desc,
-                        category: cat, amount: amount, receiptLink: '',
-                        month: month, type: 'expense'
-                    }));
-                    totalExpenses++;
-                }
-            }
-
-            if (allPromises.length === 0) {
-                showMessage('expenseMessage', 'No valid expenses to save', 'error');
-                return;
-            }
-
-            var saveBtn = document.querySelector('#expenseBatchForm button:last-child');
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Saving...';
-
-            Promise.all(allPromises)
-                .then(function() {
-                    showMessage('expenseMessage', '✅ Saved ' + totalExpenses + ' expense(s)!', 'success');
-                    document.getElementById('expenseBatchEntries').innerHTML = '';
-                    expenseBatchCounter = 1;
-                    document.getElementById('expenseBatchForm').classList.remove('active');
-                })
-                .catch(function(error) {
-                    showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = '💾 Save All Expenses';
-                });
-        }
-
-        // ─── INIT ───
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('month').value = new Date().toISOString().slice(0, 7);
-        document.getElementById('expenseDate').valueAsDate = new Date();
-
-        initGymInfo();
-        loadData();
-        loadSavedImage();
-
-        // ─── ADD TOAST STYLES DYNAMICALLY ───
-        var styleSheet = document.createElement('style');
-        styleSheet.textContent =
-            `
-            .toast-notification {
-                position: fixed;
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.8);
-                color: #ff6b6b;
-                padding: 10px 20px;
-                border-radius: 30px;
-                font-size: 14px;
-                z-index: 2000;
-                pointer-events: none;
-                white-space: nowrap;
-                animation: toastFadeOut 2s ease forwards;
-            }
-            @keyframes toastFadeOut {
-                0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                70% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
-            .receipt-overlay {
-                display: none !important;
-            }
-            .receipt-overlay.open {
-                display: flex !important;
-            }
-            @media print {
-                .receipt-overlay {
-                    display: block !important;
-                }
-                .receipt-overlay.open {
-                    display: block !important;
-                }
-                .receipt-actions {
-                    display: none !important;
-                }
-            }
-            `;
-        document.head.appendChild(styleSheet);
-    </script>
-</body>
-</html>';
-
-        var GYM_NAME = '💪 The GYMnasium';
-        var GYM_DESCRIPTION = "Your fitness journey starts here. State-of-the-art equipment, professional trainers, and a supportive community to help you achieve your goals.";
-        var GYM_TAGLINE = "🏋️ Open 24/7 | 💧 Free Water | 🧘 Yoga & Aerobics Classes";
-
-        var BANNER_IMAGES = [
-            'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&h=250&fit=crop',
-            'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1200&h=250&fit=crop'
-        ];
-        var currentBannerIndex = 0;
-
-        var payments = [];
-        var batchCounter = 1;
-        var expenseBatchCounter = 1;
-
-        // ─── TRANSACTION ID COUNTER ───
-        function getTransactionCounter() {
-            var val = localStorage.getItem('gymTransactionCounter');
-            return val ? parseInt(val, 10) : 0;
-        }
-
-        function incrementTransactionCounter() {
-            var next = getTransactionCounter() + 1;
-            localStorage.setItem('gymTransactionCounter', String(next));
-            return next;
-        }
-
-        function generateTransactionId(counter) {
-            var year = new Date().getFullYear();
-            var padded = String(counter).padStart(3, '0');
-            return 'GYM-' + year + '-' + padded;
-        }
-
-        // ─── GYM INFO ───
-        function initGymInfo() {
-            document.getElementById('gymDescription').innerText = GYM_DESCRIPTION;
-            document.getElementById('gymTagline').innerText = GYM_TAGLINE;
-            document.getElementById('receiptGymName').innerText = GYM_NAME;
-            document.getElementById('receiptGymTagline').innerText = GYM_TAGLINE;
-        }
-
-        function saveGymInfo() {
-            var newDescription = document.getElementById('adminDescription').value;
-            var newTagline = document.getElementById('adminTagline').value;
-            if (newDescription) {
-                document.getElementById('gymDescription').innerText = newDescription;
-                GYM_DESCRIPTION = newDescription;
-            }
-            if (newTagline) {
-                document.getElementById('gymTagline').innerText = newTagline;
-                GYM_TAGLINE = newTagline;
-                document.getElementById('receiptGymTagline').innerText = newTagline;
-            }
-            showMessage('message', '✅ Gym information saved!', 'success');
-            showToast('✅ Gym info saved');
-        }
-
-        // ─── DOUBLE-TAP ADMIN ───
-        var tapCount = 0;
-        var tapTimer;
-
-        function showToast(message) {
-            var existing = document.querySelector('.toast-notification');
-            if (existing) existing.remove();
-            var toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = message;
-            Object.assign(toast.style, {
-                position: 'fixed',
-                bottom: '80px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(0,0,0,0.8)',
-                color: '#ff6b6b',
-                padding: '10px 20px',
-                borderRadius: '30px',
-                fontSize: '14px',
-                zIndex: '2000',
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-                animation: 'fadeOut 2s ease forwards'
-            });
-            document.body.appendChild(toast);
-            setTimeout(function() { if (toast && toast.parentNode) toast.remove(); }, 2000);
-        }
-
-        function toggleHiddenAdmin() {
-            var panel = document.getElementById('hiddenAdmin');
-            panel.classList.toggle('active');
-            if (panel.classList.contains('active')) {
-                document.getElementById('adminDescription').value = document.getElementById('gymDescription').innerText;
-                document.getElementById('adminTagline').value = document.getElementById('gymTagline').innerText;
-                showToast('🔧 Admin Panel Opened');
-            } else {
-                showToast('🔧 Admin Panel Closed');
-            }
-        }
-
-        document.getElementById('adminTriggerHeader').addEventListener('click', function() {
-            tapCount++;
-            if (tapCount === 1) {
-                tapTimer = setTimeout(function() { tapCount = 0; }, 300);
-            } else if (tapCount === 2) {
-                clearTimeout(tapTimer);
-                tapCount = 0;
-                toggleHiddenAdmin();
-            }
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                e.preventDefault();
-                toggleHiddenAdmin();
-            }
-        });
-
-        // ─── BANNER & LOGO ───
-        function changeBannerImage() {
-            currentBannerIndex = (currentBannerIndex + 1) % BANNER_IMAGES.length;
-            document.getElementById('gymBanner').src = BANNER_IMAGES[currentBannerIndex];
-            localStorage.setItem('gymBannerImage', BANNER_IMAGES[currentBannerIndex]);
-            showMessage('message', '✅ Banner image changed!', 'success');
-            showToast('🖼️ Banner changed');
-        }
-
-        function loadSavedImage() {
-            var saved = localStorage.getItem('gymBannerImage');
-            if (saved) {
-                document.getElementById('gymBanner').src = saved;
-                for (var i = 0; i < BANNER_IMAGES.length; i++) {
-                    if (BANNER_IMAGES[i] === saved) { currentBannerIndex = i; break; }
-                }
-            }
-            var logo = localStorage.getItem('gymLogo');
-            if (logo) document.getElementById('gymLogo').src = logo;
-        }
-
-        document.getElementById('adminLogoUpload').addEventListener('change', function(event) {
-            var file = event.target.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var url = e.target.result;
-                    document.getElementById('gymLogo').src = url;
-                    localStorage.setItem('gymLogo', url);
-                    showMessage('message', '✅ Gym logo uploaded!', 'success');
-                    showToast('✅ Logo uploaded');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function resetLogo() {
-            var defaultLogo = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6b6b' rx='20'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-weight='bold'%3E💪%3C/text%3E%3C/svg%3E";
-            document.getElementById('gymLogo').src = defaultLogo;
-            localStorage.removeItem('gymLogo');
-            showMessage('message', '✅ Logo reset to default!', 'success');
-            showToast('✅ Logo reset');
-        }
-
-        // ─── TABS ───
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-            document.querySelectorAll('.form-card').forEach(function(f) { f.classList.remove('active'); });
-            if (tab === 'payment') {
-                document.querySelectorAll('.tab')[0].classList.add('active');
-                document.getElementById('paymentForm').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab')[1].classList.add('active');
-                document.getElementById('expenseForm').classList.add('active');
-            }
-        }
-
-        // ─── PAYMENT DATA ───
-        function loadData() {
-            var saved = localStorage.getItem('gymPayments');
-            if (saved) {
-                payments = JSON.parse(saved);
-            }
-            renderTable();
-            updateStats();
-        }
-
-        function saveData() {
-            localStorage.setItem('gymPayments', JSON.stringify(payments));
-            updateStats();
-        }
-
-        function updateStats() {
-            document.getElementById('paymentCount').innerText = payments.length;
-        }
-
-        function renderTable() {
-            var tbody = document.getElementById('tableBody');
-            if (payments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No payments recorded</td></tr>';
-                return;
-            }
-            var html = '';
-            for (var i = payments.length - 1; i >= 0; i--) {
-                var p = payments[i];
-                html += '<tr>';
-                html += '<td><strong>' + (p.transactionId || '—') + '</strong></td>';
-                html += '<td>' + p.date + '</td>';
-                html += '<td>' + p.paymentType + '</td>';
-                html += '<td>' + p.memberName + '</td>';
-                html += '<td>' + p.amount + '</td>';
-                html += '<td>' + p.paymentMethod + '</td>';
-                html += '<td>' + p.month + '</td>';
-                html += '</tr>';
-            }
-            tbody.innerHTML = html;
-        }
-
-        // ─── WORKER API SAVE ───
-        function saveToWorker(data) {
-            return fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(function(response) {
-                if (!response.ok) {
-                    return response.text().then(function(text) {
-                        throw new Error('Worker error: ' + response.status + ' - ' + text);
-                    });
-                }
-                return response.json();
-            })
-            .then(function(result) {
-                if (!result.success) {
-                    throw new Error(result.error || 'Unknown error from worker');
-                }
-                return result;
-            });
-        }
-
-        // ─── MESSAGE HELPER ───
-        function showMessage(elementId, msg, type) {
-            var div = document.getElementById(elementId);
-            div.textContent = msg;
-            div.className = 'message ' + type;
-            setTimeout(function() { div.className = 'message'; }, 6000);
-        }
-
-        // ─── RECEIPT FUNCTIONS ───
-        var lastReceiptData = null;
-
-        function showReceipt(payment, transactionId) {
-            // Fill receipt
-            document.getElementById('receiptNumber').textContent = '# ' + transactionId;
-            document.getElementById('receiptDate').textContent = '📅 ' + payment.date;
-            document.getElementById('receiptMember').textContent = payment.memberName;
-            document.getElementById('receiptType').textContent = payment.paymentType;
-            document.getElementById('receiptMethod').textContent = payment.paymentMethod;
-            document.getElementById('receiptMonth').textContent = payment.month;
-            document.getElementById('receiptAmount').textContent = 'K ' + parseFloat(payment.amount).toFixed(2);
-
-            // Class (optional)
-            var classRow = document.getElementById('receiptClassRow');
-            var classVal = document.getElementById('receiptClass');
-            if (payment.classType) {
-                classRow.style.display = 'flex';
-                classVal.textContent = payment.classType;
-            } else {
-                classRow.style.display = 'none';
-            }
-
-            // Notes (optional)
-            var notesRow = document.getElementById('receiptNotesRow');
-            var notesVal = document.getElementById('receiptNotes');
-            if (payment.notes && payment.notes.trim()) {
-                notesRow.style.display = 'flex';
-                notesVal.textContent = payment.notes.trim();
-            } else {
-                notesRow.style.display = 'none';
-            }
-
-            // Gym name & tagline (from current settings)
-            document.getElementById('receiptGymName').textContent = GYM_NAME;
-            document.getElementById('receiptGymTagline').textContent = GYM_TAGLINE;
-
-            // Store for print
-            lastReceiptData = { payment: payment, transactionId: transactionId };
-
-            // Show overlay
-            var overlay = document.getElementById('receiptOverlay');
-            overlay.classList.add('open');
-        }
-
-        function closeReceipt() {
-            document.getElementById('receiptOverlay').classList.remove('open');
-        }
-
-        function printReceipt() {
-            window.print();
-        }
-
-        // Auto-print after a short delay (so DOM renders)
-        function autoPrintReceipt() {
-            setTimeout(function() {
-                window.print();
-            }, 400);
-        }
-
-        // ─── PAYMENT SUBMISSION ───
-        document.getElementById('paymentEntryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            var memberName = document.getElementById('memberName').value;
-            var classType = document.getElementById('classType').value;
-            var displayName = memberName;
-            if (classType) {
-                displayName = memberName + ' (' + classType + ')';
-            }
-            var memberId = document.getElementById('memberId').value;
-
-            var payment = {
-                date: document.getElementById('date').value,
-                paymentType: document.getElementById('paymentType').value,
-                memberId: memberId || '',
-                memberName: displayName,
-                amount: parseFloat(document.getElementById('amount').value),
-                paymentMethod: document.getElementById('paymentMethod').value,
-                month: document.getElementById('month').value,
-                notes: document.getElementById('notes').value || '',
-                classType: classType || '',
-                type: 'payment'
-            };
-
-            var btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
-
-            saveToWorker(payment)
-                .then(function(result) {
-                    // Generate transaction ID
-                    var counter = incrementTransactionCounter();
-                    var transactionId = generateTransactionId(counter);
-                    payment.transactionId = transactionId;
-
-                    // Save locally
-                    payments.push(payment);
-                    saveData();
-                    renderTable();
-
-                    var memberMsg = result.memberId ? ' (Member: ' + result.memberId + ')' : '';
-                    showMessage('message', '✅ ' + displayName + ' paid ' + payment.amount + memberMsg + ' · ' + transactionId, 'success');
-
-                    // ─── SHOW RECEIPT ───
-                    showReceipt(payment, transactionId);
-
-                    // ─── AUTO-PRINT ───
-                    var autoPrint = document.getElementById('autoPrintToggle').checked;
-                    if (autoPrint) {
-                        autoPrintReceipt();
-                    }
-
-                    // Reset form
-                    document.getElementById('paymentEntryForm').reset();
-                    document.getElementById('date').valueAsDate = new Date();
-                    document.getElementById('month').value = new Date().toISOString().slice(0, 7);
-                    document.getElementById('memberId').value = '';
-                    document.getElementById('classType').value = '';
-                    document.getElementById('notes').value = '';
-                })
-                .catch(function(error) {
-                    showMessage('message', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.textContent = '💾 Save Payment';
-                });
-        });
-
-        // ─── BATCH PAYMENT ───
-        function toggleBatch() {
-            var batchForm = document.getElementById('batchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('batchEntries').children.length === 0) {
-                addBatchEntry();
-            }
-        }
-
-        function addBatchEntry() {
-            var container = document.getElementById('batchEntries');
-            var id = batchCounter;
-            var today = new Date().toISOString().slice(0, 10);
-            var currentMonth = new Date().toISOString().slice(0, 7);
-            var entryDiv = document.createElement('div');
-            entryDiv.className = 'batch-entry';
-            entryDiv.id = 'batch-' + id;
-            entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Payment #' + id + '</h4>' +
-                '<div class="form-group"><label>Date</label><input type="date" class="batch-date" value="' + today + '"></div>' +
-                '<div class="form-group"><label>Type</label>' +
-                '<select class="batch-type">' +
-                '<option value="Monthly Subscription">Monthly Subscription</option>' +
-                '<option value="Drop-in">Drop-in</option>' +
-                '<option value="Class Fee">Class Fee</option>' +
-                '<option value="Late Fee">Late Fee</option>' +
-                '</select></div>' +
-                '<div class="form-group"><label>Name</label><input type="text" class="batch-name" placeholder="Member/Guest name"></div>' +
-                '<div class="form-group"><label>Amount</label><input type="number" class="batch-amount" step="0.01" placeholder="50"></div>' +
-                '<div class="form-group"><label>Method</label>' +
-                '<select class="batch-method">' +
-                '<option value="Cash">Cash</option>' +
-                '<option value="Airtel Money">Airtel Money</option>' +
-                '<option value="Bank Transfer">Bank Transfer</option>' +
-                '</select></div>' +
-                '<div class="form-group"><label>Month</label><input type="month" class="batch-month" value="' + currentMonth + '"></div>' +
-                '<div class="form-group"><label>Class</label><input type="text" class="batch-class" placeholder="Optional"></div>' +
-                '<button class="remove-btn" onclick="removeBatchEntry(' + id + ')">Remove</button>';
-            container.appendChild(entryDiv);
-            batchCounter++;
-        }
-
-        function removeBatchEntry(id) {
-            var el = document.getElementById('batch-' + id);
-            if (el) el.remove();
-        }
-
-        function submitBatch() {
-            var entries = document.querySelectorAll('.batch-entry');
-            var allPromises = [];
-            var paymentsToSave = [];
-
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var name = entry.querySelector('.batch-name').value;
-                var amount = entry.querySelector('.batch-amount').value;
-                if (name && amount) {
-                    var payment = {
-                        date: entry.querySelector('.batch-date').value,
-                        paymentType: entry.querySelector('.batch-type').value,
-                        memberId: '',
-                        memberName: name.trim(),
-                        amount: parseFloat(amount),
-                        paymentMethod: entry.querySelector('.batch-method').value,
-                        month: entry.querySelector('.batch-month').value,
-                        notes: 'Batch entry',
-                        classType: entry.querySelector('.batch-class').value || '',
-                        type: 'payment'
-                    };
-                    paymentsToSave.push(payment);
-                }
-            }
-
-            if (paymentsToSave.length === 0) {
-                showMessage('message', 'No valid entries to save', 'error');
-                return;
-            }
-
-            showMessage('message', 'Saving ' + paymentsToSave.length + ' payment(s)...', 'success');
-
-            for (var j = 0; j < paymentsToSave.length; j++) {
-                (function(p) {
-                    allPromises.push(
-                        saveToWorker(p)
-                        .then(function() { /* success */ })
-                        .catch(function(err) { throw err; })
-                    );
-                })(paymentsToSave[j]);
-            }
-
-            Promise.all(allPromises)
-                .then(function() {
-                    // Now assign transaction IDs and save locally
-                    for (var k = 0; k < paymentsToSave.length; k++) {
-                        var counter = incrementTransactionCounter();
-                        paymentsToSave[k].transactionId = generateTransactionId(counter);
-                        payments.push(paymentsToSave[k]);
-                    }
-                    saveData();
-                    renderTable();
-
-                    // Show receipt for the last payment
-                    var last = paymentsToSave[paymentsToSave.length - 1];
-                    showReceipt(last, last.transactionId);
-                    if (document.getElementById('autoPrintToggle').checked) {
-                        autoPrintReceipt();
-                    }
-
-                    showMessage('message', '✅ Saved ' + paymentsToSave.length + ' payment(s)!', 'success');
-                    document.getElementById('batchEntries').innerHTML = '';
-                    batchCounter = 1;
-                    document.getElementById('batchForm').classList.remove('active');
-                })
-                .catch(function(error) {
-                    showMessage('message', '❌ Error: ' + error.message, 'error');
-                });
-        }
-
-        // ─── EXPENSE FUNCTIONS ───
-        function determineCategoryFromNote(note) {
-            if (!note) return 'Other';
-            var lower = note.toLowerCase();
-            if (lower.indexOf('mop') > -1) return 'Cleaning';
-            if (lower.indexOf('water') > -1 || lower.indexOf('electric') > -1) return 'Utilities';
-            if (lower.indexOf('rent') > -1) return 'Rent';
-            if (lower.indexOf('salary') > -1 || lower.indexOf('payroll') > -1) return 'Payroll';
-            if (lower.indexOf('marketing') > -1 || lower.indexOf('advert') > -1) return 'Marketing';
-            if (lower.indexOf('cleaning') > -1) return 'Cleaning';
-            if (lower.indexOf('maintenance') > -1 || lower.indexOf('repair') > -1) return 'Maintenance';
-            if (lower.indexOf('equipment') > -1) return 'Equipment';
-            return 'Other';
-        }
-
-        function parseSplitAmounts(splitStr) {
-            if (!splitStr) return null;
-            var parts = splitStr.split('+');
-            var amounts = [];
-            for (var i = 0; i < parts.length; i++) {
-                var amt = parseFloat(parts[i]);
-                if (!isNaN(amt) && amt > 0) amounts.push(amt);
-            }
-            return amounts.length > 0 ? amounts : null;
-        }
-
-        document.getElementById('expenseEntryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            var expenseNote = document.getElementById('expenseNote').value;
-            var expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
-            var splitAmounts = document.getElementById('splitAmounts').value;
-            var btn = document.getElementById('expenseSubmitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
-
-            var splits = parseSplitAmounts(splitAmounts);
-            var promises = [];
-
-            if (splits && splits.length > 0) {
-                var firstAmount = splits[0];
-                var remainingAmounts = splits.slice(1);
-                if (firstAmount === 6000) {
-                    promises.push(saveToWorker({
-                        date: document.getElementById('expenseDate').value,
-                        vendor: document.getElementById('vendor').value || '',
-                        description: 'Gym Attendant Meals',
-                        category: 'Payroll',
-                        amount: firstAmount,
-                        receiptLink: document.getElementById('receiptLink').value || '',
-                        month: document.getElementById('expenseDate').value.substring(0, 7),
-                        type: 'expense'
-                    }));
-                }
-                for (var s = 0; s < remainingAmounts.length; s++) {
-                    var cat = determineCategoryFromNote(expenseNote);
-                    promises.push(saveToWorker({
-                        date: document.getElementById('expenseDate').value,
-                        vendor: document.getElementById('vendor').value || '',
-                        description: expenseNote || 'Expense',
-                        category: cat,
-                        amount: remainingAmounts[s],
-                        receiptLink: document.getElementById('receiptLink').value || '',
-                        month: document.getElementById('expenseDate').value.substring(0, 7),
-                        type: 'expense'
-                    }));
-                }
-            } else {
+            for (var s = 0; s < remainingAmounts.length; s++) {
                 var cat = determineCategoryFromNote(expenseNote);
-                var desc = expenseNote;
-                if (expenseAmount === 6000 && !expenseNote) {
-                    cat = 'Payroll';
-                    desc = 'Gym Attendant Meals';
-                }
                 promises.push(saveToWorker({
                     date: document.getElementById('expenseDate').value,
                     vendor: document.getElementById('vendor').value || '',
-                    description: desc,
+                    description: expenseNote || 'Expense',
                     category: cat,
-                    amount: expenseAmount,
+                    amount: remainingAmounts[s],
                     receiptLink: document.getElementById('receiptLink').value || '',
                     month: document.getElementById('expenseDate').value.substring(0, 7),
                     type: 'expense'
                 }));
             }
-
-            Promise.all(promises)
-                .then(function() {
-                    showMessage('expenseMessage', '✅ Saved ' + promises.length + ' expense(s)!', 'success');
-                    document.getElementById('expenseEntryForm').reset();
-                    document.getElementById('expenseDate').valueAsDate = new Date();
-                })
-                .catch(function(error) {
-                    showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.textContent = '💾 Save Expense';
-                });
-        });
-
-        // ─── EXPENSE BATCH ───
-        function toggleExpenseBatch() {
-            var batchForm = document.getElementById('expenseBatchForm');
-            batchForm.classList.toggle('active');
-            if (batchForm.classList.contains('active') && document.getElementById('expenseBatchEntries').children.length === 0) {
-                addExpenseBatchEntry();
+        } else {
+            var cat = determineCategoryFromNote(expenseNote);
+            var desc = expenseNote;
+            if (expenseAmount === 6000 && !expenseNote) {
+                cat = 'Payroll';
+                desc = 'Gym Attendant Meals';
             }
+            promises.push(saveToWorker({
+                date: document.getElementById('expenseDate').value,
+                vendor: document.getElementById('vendor').value || '',
+                description: desc,
+                category: cat,
+                amount: expenseAmount,
+                receiptLink: document.getElementById('receiptLink').value || '',
+                month: document.getElementById('expenseDate').value.substring(0, 7),
+                type: 'expense'
+            }));
         }
 
-        function addExpenseBatchEntry() {
-            var container = document.getElementById('expenseBatchEntries');
-            var id = expenseBatchCounter;
-            var today = new Date().toISOString().slice(0, 10);
-            var entryDiv = document.createElement('div');
-            entryDiv.className = 'batch-entry';
-            entryDiv.id = 'expense-batch-' + id;
-            entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Expense #' + id + '</h4>' +
-                '<div class="form-group"><label>Date</label><input type="date" class="batch-expense-date" value="' + today + '"></div>' +
-                '<div class="form-group"><label>Vendor</label><input type="text" class="batch-expense-vendor" placeholder="Optional"></div>' +
-                '<div class="form-group"><label>Description / Note</label><input type="text" class="batch-expense-note" placeholder="e.g., water bill, salaries"></div>' +
-                '<div class="form-group"><label>Amount</label><input type="number" class="batch-expense-amount" step="0.01" placeholder="6000"></div>' +
-                '<div class="form-group"><label>Split Amounts</label><input type="text" class="batch-expense-split" placeholder="e.g., 6000+50000"></div>' +
-                '<button class="remove-btn" onclick="removeExpenseBatchEntry(' + id + ')">Remove</button>';
-            container.appendChild(entryDiv);
-            expenseBatchCounter++;
+        Promise.all(promises)
+            .then(function() {
+                showMessage('expenseMessage', '✅ Saved ' + promises.length + ' expense(s)!', 'success');
+                document.getElementById('expenseEntryForm').reset();
+                document.getElementById('expenseDate').valueAsDate = new Date();
+            })
+            .catch(function(error) {
+                showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+            })
+            .finally(function() {
+                btn.disabled = false;
+                btn.textContent = '💾 Save Expense';
+            });
+    });
+
+    // ─── EXPENSE BATCH ───
+    function toggleExpenseBatch() {
+        var batchForm = document.getElementById('expenseBatchForm');
+        batchForm.classList.toggle('active');
+        if (batchForm.classList.contains('active') && document.getElementById('expenseBatchEntries').children.length === 0) {
+            addExpenseBatchEntry();
         }
+    }
 
-        function removeExpenseBatchEntry(id) {
-            var el = document.getElementById('expense-batch-' + id);
-            if (el) el.remove();
-        }
+    function addExpenseBatchEntry() {
+        var container = document.getElementById('expenseBatchEntries');
+        var id = expenseBatchCounter;
+        var today = new Date().toISOString().slice(0, 10);
+        var entryDiv = document.createElement('div');
+        entryDiv.className = 'batch-entry';
+        entryDiv.id = 'expense-batch-' + id;
+        entryDiv.innerHTML = '<h4 style="margin-bottom:10px;">Expense #' + id + '</h4>' +
+            '<div class="form-group"><label>Date</label><input type="date" class="batch-expense-date" value="' + today + '"></div>' +
+            '<div class="form-group"><label>Vendor</label><input type="text" class="batch-expense-vendor" placeholder="Optional"></div>' +
+            '<div class="form-group"><label>Description / Note</label><input type="text" class="batch-expense-note" placeholder="e.g., water bill, salaries"></div>' +
+            '<div class="form-group"><label>Amount</label><input type="number" class="batch-expense-amount" step="0.01" placeholder="6000"></div>' +
+            '<div class="form-group"><label>Split Amounts</label><input type="text" class="batch-expense-split" placeholder="e.g., 6000+50000"></div>' +
+            '<button class="remove-btn" onclick="removeExpenseBatchEntry(' + id + ')">Remove</button>';
+        container.appendChild(entryDiv);
+        expenseBatchCounter++;
+    }
 
-        function submitExpenseBatch() {
-            var entries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
-            var allPromises = [];
-            var totalExpenses = 0;
+    function removeExpenseBatchEntry(id) {
+        var el = document.getElementById('expense-batch-' + id);
+        if (el) el.remove();
+    }
 
-            for (var i = 0; i < entries.length; i++) {
-                var entry = entries[i];
-                var date = entry.querySelector('.batch-expense-date').value;
-                var vendor = entry.querySelector('.batch-expense-vendor').value;
-                var note = entry.querySelector('.batch-expense-note').value;
-                var amount = parseFloat(entry.querySelector('.batch-expense-amount').value);
-                var splitStr = entry.querySelector('.batch-expense-split').value;
-                if (!date || !note) continue;
-                var month = date.substring(0, 7);
-                var splits = parseSplitAmounts(splitStr);
+    function submitExpenseBatch() {
+        var entries = document.querySelectorAll('#expenseBatchEntries .batch-entry');
+        var allPromises = [];
+        var totalExpenses = 0;
 
-                if (splits && splits.length > 0) {
-                    var firstAmount = splits[0];
-                    var remainingAmounts = splits.slice(1);
-                    if (firstAmount === 6000) {
-                        allPromises.push(saveToWorker({
-                            date: date, vendor: vendor, description: 'Gym Attendant Meals',
-                            category: 'Payroll', amount: firstAmount, receiptLink: '',
-                            month: month, type: 'expense'
-                        }));
-                        totalExpenses++;
-                    }
-                    for (var s = 0; s < remainingAmounts.length; s++) {
-                        var cat = determineCategoryFromNote(note);
-                        allPromises.push(saveToWorker({
-                            date: date, vendor: vendor, description: note || 'Expense',
-                            category: cat, amount: remainingAmounts[s], receiptLink: '',
-                            month: month, type: 'expense'
-                        }));
-                        totalExpenses++;
-                    }
-                } else if (amount > 0) {
-                    var cat = determineCategoryFromNote(note);
-                    var desc = note;
-                    if (amount === 6000 && !note) { cat = 'Payroll';
-                        desc = 'Gym Attendant Meals'; }
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            var date = entry.querySelector('.batch-expense-date').value;
+            var vendor = entry.querySelector('.batch-expense-vendor').value;
+            var note = entry.querySelector('.batch-expense-note').value;
+            var amount = parseFloat(entry.querySelector('.batch-expense-amount').value);
+            var splitStr = entry.querySelector('.batch-expense-split').value;
+            if (!date || !note) continue;
+            var month = date.substring(0, 7);
+            var splits = parseSplitAmounts(splitStr);
+
+            if (splits && splits.length > 0) {
+                var firstAmount = splits[0];
+                var remainingAmounts = splits.slice(1);
+                if (firstAmount === 6000) {
                     allPromises.push(saveToWorker({
-                        date: date, vendor: vendor, description: desc,
-                        category: cat, amount: amount, receiptLink: '',
+                        date: date, vendor: vendor, description: 'Gym Attendant Meals',
+                        category: 'Payroll', amount: firstAmount, receiptLink: '',
                         month: month, type: 'expense'
                     }));
                     totalExpenses++;
                 }
+                for (var s = 0; s < remainingAmounts.length; s++) {
+                    var cat = determineCategoryFromNote(note);
+                    allPromises.push(saveToWorker({
+                        date: date, vendor: vendor, description: note || 'Expense',
+                        category: cat, amount: remainingAmounts[s], receiptLink: '',
+                        month: month, type: 'expense'
+                    }));
+                    totalExpenses++;
+                }
+            } else if (amount > 0) {
+                var cat = determineCategoryFromNote(note);
+                var desc = note;
+                if (amount === 6000 && !note) { cat = 'Payroll';
+                    desc = 'Gym Attendant Meals'; }
+                allPromises.push(saveToWorker({
+                    date: date, vendor: vendor, description: desc,
+                    category: cat, amount: amount, receiptLink: '',
+                    month: month, type: 'expense'
+                }));
+                totalExpenses++;
             }
-
-            if (allPromises.length === 0) {
-                showMessage('expenseMessage', 'No valid expenses to save', 'error');
-                return;
-            }
-
-            var saveBtn = document.querySelector('#expenseBatchForm button:last-child');
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Saving...';
-
-            Promise.all(allPromises)
-                .then(function() {
-                    showMessage('expenseMessage', '✅ Saved ' + totalExpenses + ' expense(s)!', 'success');
-                    document.getElementById('expenseBatchEntries').innerHTML = '';
-                    expenseBatchCounter = 1;
-                    document.getElementById('expenseBatchForm').classList.remove('active');
-                })
-                .catch(function(error) {
-                    showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
-                })
-                .finally(function() {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = '💾 Save All Expenses';
-                });
         }
 
-        // ─── INIT ───
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('month').value = new Date().toISOString().slice(0, 7);
-        document.getElementById('expenseDate').valueAsDate = new Date();
+        if (allPromises.length === 0) {
+            showMessage('expenseMessage', 'No valid expenses to save', 'error');
+            return;
+        }
 
-        initGymInfo();
-        loadData();
-        loadSavedImage();
+        var saveBtn = document.querySelector('#expenseBatchForm button:last-child');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
 
-        // ─── ADD TOAST STYLES DYNAMICALLY ───
-        var styleSheet = document.createElement('style');
-        styleSheet.textContent =
-            `
-            .toast-notification {
-                position: fixed;
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0,0,0,0.8);
-                color: #ff6b6b;
-                padding: 10px 20px;
-                border-radius: 30px;
-                font-size: 14px;
-                z-index: 2000;
-                pointer-events: none;
-                white-space: nowrap;
-                animation: toastFadeOut 2s ease forwards;
-            }
-            @keyframes toastFadeOut {
-                0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                70% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
+        Promise.all(allPromises)
+            .then(function() {
+                showMessage('expenseMessage', '✅ Saved ' + totalExpenses + ' expense(s)!', 'success');
+                document.getElementById('expenseBatchEntries').innerHTML = '';
+                expenseBatchCounter = 1;
+                document.getElementById('expenseBatchForm').classList.remove('active');
+            })
+            .catch(function(error) {
+                showMessage('expenseMessage', '❌ Error: ' + error.message, 'error');
+            })
+            .finally(function() {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Save All Expenses';
+            });
+    }
+
+    // ─── INIT ───
+    document.getElementById('date').valueAsDate = new Date();
+    document.getElementById('month').value = new Date().toISOString().slice(0, 7);
+    document.getElementById('expenseDate').valueAsDate = new Date();
+
+    initGymInfo();
+    loadData();
+    loadSavedImage();
+
+    // ─── ADD TOAST STYLES DYNAMICALLY ───
+    var styleSheet = document.createElement('style');
+    styleSheet.textContent =
+        `
+        .toast-notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 2000;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: toastFadeOut 2s ease forwards;
+        }
+        @keyframes toastFadeOut {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            70% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+        .receipt-overlay {
+            display: none !important;
+        }
+        .receipt-overlay.open {
+            display: flex !important;
+        }
+        @media print {
             .receipt-overlay {
-                display: none !important;
+                display: block !important;
             }
             .receipt-overlay.open {
-                display: flex !important;
+                display: block !important;
             }
-            @media print {
-                .receipt-overlay {
-                    display: block !important;
-                }
-                .receipt-overlay.open {
-                    display: block !important;
-                }
-                .receipt-actions {
-                    display: none !important;
-                }
+            .receipt-actions {
+                display: none !important;
             }
-            `;
-        document.head.appendChild(styleSheet);
-    </script>
-</body>
-</html>
+        }
+        `;
+    document.head.appendChild(styleSheet);
+</script>
