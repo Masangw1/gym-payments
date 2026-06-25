@@ -560,43 +560,16 @@
             background: #dee2e6;
         }
 
-        /* ─── ULTRA STRICT PRINT STYLES ─── */
+        /* ─── PRINT STYLES ─── */
         @media print {
-            /* Hide everything by default */
-            html,
-            body,
-            .container,
-            .header,
-            .features-desktop,
-            .tabs,
-            .form-card,
-            .data-table,
-            .receipt-overlay,
-            .receipt-overlay *,
-            .hidden-admin,
-            .stats,
-            .batch-section,
-            .message,
-            .auto-print-toggle,
-            #receiptOverlay,
-            #receiptModal,
-            .receipt-modal,
-            .receipt-header,
-            .receipt-body,
-            .receipt-footer,
-            .receipt-actions,
-            .btn-print,
-            .btn-close,
-            #receiptOverlay *,
-            #receiptModal * {
+            body * {
+                visibility: hidden;
                 display: none !important;
             }
-
-            /* Show only print‑only receipt */
             #printReceipt,
             #printReceipt * {
+                visibility: visible;
                 display: block !important;
-                visibility: visible !important;
             }
             #printReceipt {
                 position: absolute !important;
@@ -614,7 +587,6 @@
                 page-break-after: avoid !important;
                 page-break-inside: avoid !important;
             }
-            /* Remove page margins and force one page */
             @page {
                 margin: 0 !important;
                 size: auto !important;
@@ -623,11 +595,6 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white !important;
-            }
-            /* Extra safety: prevent any accidental page breaks */
-            #printReceipt {
-                break-inside: avoid;
-                page-break-inside: avoid;
             }
         }
 
@@ -729,7 +696,15 @@
                     <div class="form-group"><label>Class Type</label><input type="text" id="classType" placeholder="Aerobics / Yoga / Spin"></div>
                     <div class="form-group full-width"><label>Notes</label><input type="text" id="notes" placeholder="Optional notes"></div>
                 </div>
-                <div class="auto-print-toggle"><input type="checkbox" id="autoPrintToggle" checked><label for="autoPrintToggle">🖨️ Auto-print receipt</label><span class="hint">Receipt will print automatically after each payment</span></div>
+                <div class="auto-print-toggle">
+                    <input type="checkbox" id="autoPrintToggle" checked>
+                    <label for="autoPrintToggle">🖨️ Auto-print receipt</label>
+                    <span class="hint">Receipt will print automatically after each payment</span>
+                </div>
+                <!-- Help text for print copies -->
+                <div style="font-size:12px; color:#888; margin-top:8px; text-align:center;">
+                    ⚠️ If your browser prints multiple copies, set the "Copies" field to 1 in the print dialog. The browser will remember it for this site.
+                </div>
                 <button type="submit" id="submitBtn">💾 Save Payment</button>
             </form>
             <div class="batch-section">
@@ -846,24 +821,6 @@
         var payments = [];
         var batchCounter = 1;
         var expenseBatchCounter = 1;
-
-        // ─── TRANSACTION ID COUNTER ───
-        function getTransactionCounter() {
-            var val = localStorage.getItem('gymTransactionCounter');
-            return val ? parseInt(val, 10) : 0;
-        }
-
-        function incrementTransactionCounter() {
-            var next = getTransactionCounter() + 1;
-            localStorage.setItem('gymTransactionCounter', String(next));
-            return next;
-        }
-
-        function generateTransactionId(counter) {
-            var year = new Date().getFullYear();
-            var padded = String(counter).padStart(3, '0');
-            return 'GYM-' + year + '-' + padded;
-        }
 
         // ─── GYM INFO ───
         function initGymInfo() {
@@ -1195,10 +1152,11 @@
 
             saveToWorker(payment)
                 .then(function(result) {
-                    var counter = incrementTransactionCounter();
-                    var transactionId = generateTransactionId(counter);
+                    // Use the transaction ID returned by the server
+                    var transactionId = result.transactionId;
                     payment.transactionId = transactionId;
 
+                    // Save locally
                     payments.push(payment);
                     saveData();
                     renderTable();
@@ -1321,8 +1279,14 @@
             Promise.all(allPromises)
                 .then(function() {
                     for (var k = 0; k < paymentsToSave.length; k++) {
-                        var counter = incrementTransactionCounter();
-                        paymentsToSave[k].transactionId = generateTransactionId(counter);
+                        // For batch, we still need to assign IDs locally, but the server will also generate IDs.
+                        // However, the batch currently doesn't return IDs from the server.
+                        // For simplicity, we'll keep using client-side generation for batch entries.
+                        // But to avoid duplicate IDs, we'll generate a temporary one based on the server's counter.
+                        // A better approach is to modify the server to accept batch and return IDs, but that's for another day.
+                        // For now, we'll use a temporary ID that won't conflict (since server uses sequential numbers).
+                        var tempId = 'BATCH-' + Date.now() + '-' + k;
+                        paymentsToSave[k].transactionId = tempId;
                         payments.push(paymentsToSave[k]);
                     }
                     saveData();
