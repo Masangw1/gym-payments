@@ -561,45 +561,45 @@
         }
 
         /* ─── PRINT STYLES ─── */
-@media print {
-    /* Hide everything */
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-        height: auto !important;
-    }
-    body * {
-        display: none !important;
-        visibility: hidden !important;
-    }
-    /* Show print receipt */
-    #printReceipt,
-    #printReceipt * {
-        display: block !important;
-        visibility: visible !important;
-    }
-    #printReceipt {
-        display: block !important;
-        position: relative !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        height: auto !important;
-        padding: 20px !important;
-        margin: 0 auto !important;
-        background: white !important;
-        box-sizing: border-box !important;
-        page-break-inside: avoid !important;
-        overflow: visible !important;
-    }
-    @page {
-        margin: 0 !important;
-        size: auto !important;
-    }
-}
-}#printReceipt {
-    display: none; /* hidden on screen */
-}
+        @media print {
+            /* Hide everything on the page */
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+            }
+            body * {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            /* Show only the print‑only receipt */
+            #printReceipt,
+            #printReceipt * {
+                display: block !important;
+                visibility: visible !important;
+            }
+            #printReceipt {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                padding: 20px !important;
+                margin: 0 auto !important;
+                background: white !important;
+                box-sizing: border-box !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+                overflow: visible !important;
+            }
+            @page {
+                margin: 0 !important;
+                size: auto !important;
+            }
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -775,7 +775,7 @@
         </div>
     </div>
 
-    <!-- PRINT-ONLY RECEIPT -->
+    <!-- PRINT-ONLY RECEIPT (hidden on screen, shown on print) -->
     <div id="printReceipt" style="background:white; padding:20px; font-family: Arial, sans-serif; max-width:400px; margin:0 auto;">
         <div style="text-align:center; border-bottom:2px solid #ff6b6b; padding-bottom:10px; margin-bottom:10px;">
             <div style="font-size:22px; font-weight:700;" id="printGymName">💪 The GYMnasium</div>
