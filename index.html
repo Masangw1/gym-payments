@@ -95,7 +95,7 @@
         .receipt-actions .btn-close { background: #e9ecef; color: #333; }
         .receipt-actions .btn-close:hover { background: #dee2e6; }
 
-        /* ─── PRINT STYLES (FIXED) ─── */
+        /* ─── PRINT STYLES ─── */
         @media print {
             body * {
                 visibility: hidden;
@@ -117,6 +117,7 @@
                 animation: none !important;
                 z-index: auto !important;
                 box-shadow: none !important;
+                overflow: visible !important;
             }
             #receiptOverlay .receipt-modal {
                 max-width: 100% !important;
@@ -128,6 +129,7 @@
                 margin: 0 auto !important;
                 width: 100% !important;
                 border: none !important;
+                page-break-after: avoid;
             }
             .receipt-actions {
                 display: none !important;
@@ -137,6 +139,10 @@
             }
             .receipt-footer .powered {
                 display: none !important;
+            }
+            /* Ensure no extra pages */
+            #receiptOverlay .receipt-body {
+                page-break-inside: avoid;
             }
         }
 
@@ -276,31 +282,6 @@
         </div>
         <div class="receipt-footer"><div class="thank-you">🙏 Thank You!</div><div class="powered">Powered by GYMnasium · Receipt generated automatically</div></div>
         <div class="receipt-actions"><button class="btn-print" onclick="printReceipt()">🖨️ Print Receipt</button><button class="btn-close" onclick="closeReceipt()">✕ Close</button></div>
-    </div>
-</div>
-
-<!-- PRINT-ONLY RECEIPT (hidden on screen, shown when printing) -->
-<div id="printReceipt" style="display:none; background:white; padding:20px; font-family: Arial, sans-serif; max-width:400px; margin:0 auto;">
-    <div style="text-align:center; border-bottom:2px solid #ff6b6b; padding-bottom:10px; margin-bottom:10px;">
-        <div style="font-size:22px; font-weight:700;" id="printGymName">💪 The GYMnasium</div>
-        <div style="font-size:12px; opacity:0.7;" id="printGymTagline">🏋️ Open Daily · 🧘 Aerobics Classes</div>
-    </div>
-    <div style="margin:10px 0;">
-        <div><strong>Receipt #</strong> <span id="printReceiptNumber">GYM-2026-001</span></div>
-        <div><strong>Date</strong> <span id="printReceiptDate">2026-06-21</span></div>
-        <hr>
-        <div><strong>Member / Guest</strong> <span id="printReceiptMember">John Doe</span></div>
-        <div><strong>Payment Type</strong> <span id="printReceiptType">Monthly Subscription</span></div>
-        <div><strong>Payment Method</strong> <span id="printReceiptMethod">Cash</span></div>
-        <div><strong>Month</strong> <span id="printReceiptMonth">2026-06</span></div>
-        <div id="printReceiptClassRow" style="display:none;"><strong>Class</strong> <span id="printReceiptClass">—</span></div>
-        <div id="printReceiptNotesRow" style="display:none;"><strong>Notes</strong> <span id="printReceiptNotes">—</span></div>
-        <hr>
-        <div style="font-size:24px; font-weight:700; color:#ff6b6b; text-align:right;">K <span id="printReceiptAmount">50.00</span></div>
-    </div>
-    <div style="text-align:center; border-top:1px solid #ccc; padding-top:10px; margin-top:10px; font-size:12px; color:#888;">
-        <div style="font-size:16px; font-weight:600; color:#ff6b6b;">🙏 Thank You!</div>
-        <div>Powered by GYMnasium · Receipt generated automatically</div>
     </div>
 </div>
 
@@ -562,7 +543,6 @@ function showMessage(elementId, msg, type) {
 var lastReceiptData = null;
 
 function showReceipt(payment, transactionId) {
-    // Update screen overlay
     document.getElementById('receiptNumber').textContent = '# ' + transactionId;
     document.getElementById('receiptDate').textContent = '📅 ' + payment.date;
     document.getElementById('receiptMember').textContent = payment.memberName;
@@ -596,35 +576,6 @@ function showReceipt(payment, transactionId) {
 
     var overlay = document.getElementById('receiptOverlay');
     overlay.classList.add('open');
-
-    // ─── Update the print‑only receipt (hidden div) ───
-    document.getElementById('printReceiptNumber').textContent = transactionId;
-    document.getElementById('printReceiptDate').textContent = payment.date;
-    document.getElementById('printReceiptMember').textContent = payment.memberName;
-    document.getElementById('printReceiptType').textContent = payment.paymentType;
-    document.getElementById('printReceiptMethod').textContent = payment.paymentMethod;
-    document.getElementById('printReceiptMonth').textContent = payment.month;
-    document.getElementById('printReceiptAmount').textContent = parseFloat(payment.amount).toFixed(2);
-    document.getElementById('printGymName').textContent = GYM_NAME;
-    document.getElementById('printGymTagline').textContent = GYM_TAGLINE;
-
-    var printClassRow = document.getElementById('printReceiptClassRow');
-    var printClassVal = document.getElementById('printReceiptClass');
-    if (payment.classType) {
-        printClassRow.style.display = 'block';
-        printClassVal.textContent = payment.classType;
-    } else {
-        printClassRow.style.display = 'none';
-    }
-
-    var printNotesRow = document.getElementById('printReceiptNotesRow');
-    var printNotesVal = document.getElementById('printReceiptNotes');
-    if (payment.notes && payment.notes.trim()) {
-        printNotesRow.style.display = 'block';
-        printNotesVal.textContent = payment.notes.trim();
-    } else {
-        printNotesRow.style.display = 'none';
-    }
 }
 
 function closeReceipt() {
@@ -1079,7 +1030,6 @@ styleSheet.textContent =
         }
     }
     `;
-// PRINT-ONLY RECEIPT (hidden on screen, shown when printing) – now a JavaScript comment
 document.head.appendChild(styleSheet);
 </script>
 </body>
